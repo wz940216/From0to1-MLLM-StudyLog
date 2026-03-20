@@ -1,0 +1,16 @@
+{
+  "model_name_or_path": "models/Qwen1.5-1.8B-Chat",
+  "train_file": "dataset/alpaca-chinese-dataset/data_v3/alpaca_chinese_part_0.json",
+  "eval_file": "dataset/alpaca-chinese-dataset/data_v3/alpaca_chinese_part_1.json",
+  "output_dir": "week2/Qwen1.5-1.8B-Chat-lora",
+  "max_length": 1024,
+  "per_device_train_batch_size": 1,
+  "per_device_eval_batch_size": 1,
+  "num_train_epochs": 2,
+  "learning_rate": 0.001,
+  "weight_decay": 0.01,
+  "eval_steps": 500,
+  "save_steps": 500,
+  "logging_steps": 50,
+  "gradient_checkpointing": true
+}

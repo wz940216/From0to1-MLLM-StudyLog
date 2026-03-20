@@ -1,0 +1,14 @@
+# Ignore dataset and model directories
+/dataset/
+/models/
+/week2/Qwen1.5-1.8B-Chat-lora
+/week2/my_alpaca_val_dataset
+/week2/my_alpaca_train_dataset
+
+
+# Optional common ignores
+*.pyc
+__pycache__/
+.env
+*.log
+.vscode

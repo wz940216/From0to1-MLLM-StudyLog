@@ -1,4 +1,4 @@
-```markdown
+
 # From0to1-MLLM-StudyLog
 
 > 从 0 到 1 自学多模态大模型（MLLM）的 24 周实践与工程记录
@@ -55,7 +55,6 @@
 ├── week22_project_core_impl/
 ├── week23_project_optimize/
 └── week24_project_release_summary/
-```
 ```
 ---
 

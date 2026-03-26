@@ -214,7 +214,7 @@
 
 ---
 
-## 第 17–20 周：推理加速 & 部署（你的优势阶段）
+## 第 17–20 周：推理加速 & 部署
 
 ### 第 17 周：LLM 推理优化 & vLLM
 
@@ -233,7 +233,7 @@
 
 | 天   | 学习内容                                                 | 目标                         | 参考文档/论文                                                |
 | ---- | -------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------ |
-| 周一 | 安装 TensorRT & ONNX Runtime；复习你原有经验             | 搭建推理加速环境             | TensorRT 文档<br>https://docs.nvidia.com/deeplearning/tensorrt/ |
+| 周一 | 安装 TensorRT & ONNX Runtime；            | 搭建推理加速环境             | TensorRT 文档<br>https://docs.nvidia.com/deeplearning/tensorrt/ |
 | 周二 | 将 CLIP-ViT-B/16 导出 ONNX，并在 ONNX Runtime 中推理验证 | 具备 ONNX 导出和验证能力     | —                                                            |
 | 周三 | 从 ONNX 转 TensorRT，引擎 FP16 推理，比较速度            | 完成 TRT 加速 Vision Encoder | —                                                            |
 | 周四 | （可选）尝试导入 OpenVINO 并在 CPU 上测试                | 掌握另一种部署路径           | OpenVINO 文档<br>https://docs.openvino.ai/                   |
@@ -268,7 +268,7 @@
 
 ---
 
-## 第 21–24 周：代表性项目（推荐：文档多模态问答系统）
+## 第 21–24 周：代表性项目（文档多模态问答系统）
 
 ### 第 21 周：需求分析 & 系统设计
 

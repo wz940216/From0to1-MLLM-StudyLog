@@ -219,11 +219,13 @@ $$
 5.2 Softmax 归一化不同
 
 I→T（行 softmax）：
+
 $$
 \sum_{j} \exp(S_{i,j}/\tau)
 $$
 
 T→I（列 softmax）：
+
 $$
 \sum_{i} \exp(S_{i,j}/\tau)
 $$

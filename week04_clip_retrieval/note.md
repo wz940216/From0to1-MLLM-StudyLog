@@ -18,16 +18,19 @@ $$
 1.1 编码与归一化
 
 - 图像编码：
+
   $$
   v_i = f_{\text{image}}(I_i)
   $$
 
 - 文本编码：
+
   $$
   t_i = f_{\text{text}}(T_i)
   $$
 
 - L2 归一化：
+
   $$
   v_i \leftarrow \frac{v_i}{|v_i|}, \quad t_i \leftarrow \frac{t_i}{|t_i|}
   $$

@@ -42,19 +42,25 @@ v_i^\top t_j = \cos(\theta_{i,j})
 $$
 
 L2 normalize 后：
+
 $$
 ∥x∥=1∥y∥=1
 $$
+
 所有向量都被投到 **单位球面**
 
 原本：
+
 $$
 dot(x,y)=∥x∥∥y∥cos⁡θ
 $$
+
 归一化后：
+
 $$
 dot(x,y)=cos⁡θ
 $$
+
 **只剩“方向”，没有“长度”**
 
 如果不 normalize，会发生什么？

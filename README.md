@@ -304,5 +304,7 @@ pip install -r requirements.txt
 
 ## 抱团
 如果你也在做类似的自学/实践，欢迎一起讨论、互相借鉴。
+
 欢迎加入微信群一起学习一起成长
+
 ![MLLM交流学习群](docs/mllm.jpg "MLLM交流学习群")

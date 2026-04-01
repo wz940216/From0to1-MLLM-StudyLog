@@ -301,10 +301,14 @@ pip install -r requirements.txt
 感谢这些开源工作为本仓库提供了丰富的实践素材与灵感。
 
 ---
-
 ## 抱团
 如果你也在做类似的自学/实践，欢迎一起讨论、互相借鉴。
 
 欢迎加入微信群一起学习一起成长
 
-![MLLM交流学习群](docs/mllm.jpg "MLLM交流学习群")
+---
+
+<div style="text-align: center;">
+  <img src="docs/mllm.jpg" alt="MLLM交流学习群" style="zoom:20%;" />
+</div>
+

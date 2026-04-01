@@ -164,7 +164,7 @@ P-tuning v1 和Prompt Tuning思想非常接近，都是固定模型参数，在e
 
 P-tuning v2 和Prefix Tuning思想非常接近，都是固定模型参数，在transformer层内部注入一段可学习的向量。Prefix Tuning在decoder k v上进行注入，而P-tuning v2推广到更多区域，不局限与decoder的kv，也可在encoder或Q上进行注入。
 
-**[Adapter-Tuning](https://zhida.zhihu.com/search?content_id=248624711&content_type=Article&match_order=1&q=Adapter-Tuning&zhida_source=entity)**：冻结原模型参数，在模型的层与层之间插入小型的 adapter 模块，仅对 adapter 模块进行训练。
+**Adapter-Tuning**：冻结原模型参数，在模型的层与层之间插入小型的 adapter 模块，仅对 adapter 模块进行训练。
 
 ## 二、各种LORA对比
 

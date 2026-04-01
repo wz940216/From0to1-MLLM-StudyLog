@@ -467,3 +467,13 @@ most_likely_label = labels[most_likely_idx]
 
 print(f"Most likely label: {most_likely_label} with probability: {probs[0][most_likely_idx].item():.3f}")
 ```
+# CLIP做检索和零样本分类
+```shell
+week04_clip_retrieval/code/clip_simple_image_retrieval.py
+week04_clip_retrieval/code/clip_zero_shot_classification.py
+```
+代码示例如上，clip做图像检索和零样本分类时，最大的区别是：
+- 在做图像检索时是用text和image_features矩阵的转至计算相似度，用文字检索图像。
+- 而在做零样本分类时，实际上是在用图片检索文本，计算的是image_feature和texts转至的相似度。
+ 
+传统分类模型使用固定类别的分类头，对图像进行特征提取后，由分类头进行输出，并经过softmax转换成对应类别的概率。与clip的检索方式相比类别固定不变，若要增加类别需重新训练分类头。

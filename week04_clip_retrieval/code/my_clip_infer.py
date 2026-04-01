@@ -19,7 +19,7 @@ inputs = processor(text=labels, images=image, return_tensors="pt", padding=True)
 with torch.no_grad():
     # 图像特征[1,512]
     image_features = model.get_image_features(pixel_values=inputs["pixel_values"])
-    
+            
     # 文本特征[3,512]
     text_features = model.get_text_features(
         input_ids=inputs["input_ids"],

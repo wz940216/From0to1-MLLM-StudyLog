@@ -1,5 +1,5 @@
 # Ignore dataset and model directories
-/dataset/
+
 /models/
 /week02_sft_lora_qlora/code/Qwen1.5-1.8B-Chat-lora
 /week02_sft_lora_qlora/code/my_alpaca_val_dataset

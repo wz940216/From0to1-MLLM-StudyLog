@@ -367,3 +367,95 @@ Q-Former 不在每层使用 cross-attention，主要有三个原因：
 
 同时，间隔插入 cross-attention 可以形成
 “信息提取 + 语义融合”的交替过程，从而更高效地完成跨模态对齐。
+
+#### BLIP2 caption实验实验代码
+```python
+from transformers import Blip2Processor, Blip2ForConditionalGeneration
+from PIL import Image
+import torch
+
+# ==============================
+# 1. 加载模型和预处理器
+# ==============================
+
+processor = Blip2Processor.from_pretrained("models/blip2-flan-t5-xl")
+
+model = Blip2ForConditionalGeneration.from_pretrained(
+    "models/blip2-flan-t5-xl",
+    torch_dtype=torch.float16  # 推荐半精度
+)
+
+# ==============================
+# 2. 加载图片
+# ==============================
+
+img_url = "week05_blip_blip2_caption/code/000000039769.jpg"
+image = Image.open(img_url).convert("RGB")
+
+# ==============================
+# 3. 预处理输入
+# ==============================
+
+# BLIP-2 支持 prompt（可以引导生成）
+prompt = "Question: What is in the image? Answer:"
+#prompt = "Question: Describe the image in detail. Answer:"
+
+inputs = processor(images=image, text=prompt, return_tensors="pt")
+
+# ==============================
+# 4. 将模型和数据移动到 GPU
+# ==============================
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model.to(device)
+
+inputs = {k: v.to(device) for k, v in inputs.items()}
+
+# ==============================
+# 5. 生成 caption
+# ==============================
+
+with torch.no_grad():
+    out = model.generate(
+        **inputs,
+        max_new_tokens=50,   # 注意这里是 max_new_tokens（BLIP-2常用）
+        num_beams=5,
+        temperature=1.0
+    )
+
+# ==============================
+# 6. 解码输出
+# ==============================
+
+caption = processor.decode(out[0], skip_special_tokens=True)
+
+# ==============================
+# 7. 打印结果
+# ==============================
+
+print("Caption:", caption)
+```
+
+对比BLIP和BLIP2的结果令人吃惊  
+BLIP的输出：  
+two cats sleeping on a couch with a remote control  
+BLIP2的输出：  
+two cats  
+当我用"Question: What is in the image? Answer:"的prompt给BLIP2，让他解释一下图片内容时，本以为会比BLIP2有大模型的加持，回答的会更丰富，但他却给我两个词。。。
+
+当我换一个Prompt后"Question: Describe the image in detail. Answer:"，BLIP2的回答开始丰富了：  
+Two cats are sleeping on a couch next to remotes  
+
+对比后的结论：**不是BLIP2比BLIP弱，而是两种模型在做不同任务，所以输出风格完全不同。**  
+BLIP的原生功能是**图像描述（Image Captioning）任务**  
+专门训练成：看图，并生成**完整、自然、尽量详细的句子**，所以BLIP会**尽可能丰富地讲故事**  
+BLIP2本质是在做 **视觉问答（VQA, Visual Question Answering）任务**  
+先理解问题，再给出**最直接、最简洁的答案**  
+对于第一个问题：What is in the image?，标准答案就是two cats  
+所以BLIP2 本质是问答驱动的  
+而BLIP：是端到端训练的caption模型，更偏生成描述  
+BLIP更像是在看**图写话**，BLIP2更像是在**答题**
+
+
+
+

@@ -10,7 +10,7 @@ processor = Blip2Processor.from_pretrained("models/blip2-flan-t5-xl")
 
 model = Blip2ForConditionalGeneration.from_pretrained(
     "models/blip2-flan-t5-xl",
-    torch_dtype=torch.float16  # 推荐半精度
+    torch_dtype=torch.float16  # 半精度
 )
 
 # ==============================
@@ -24,7 +24,7 @@ image = Image.open(img_url).convert("RGB")
 # 3. 预处理输入
 # ==============================
 
-# BLIP-2 支持 prompt（可以引导生成）
+# BLIP-2 支持 prompt 可以引导生成
 # prompt = "Question: What is in the image? Answer:"
 
 prompt = "Question: Describe the image in detail. Answer:"
@@ -47,7 +47,7 @@ inputs = {k: v.to(device) for k, v in inputs.items()}
 with torch.no_grad():
     out = model.generate(
         **inputs,
-        max_new_tokens=50,   # 注意这里是 max_new_tokens（BLIP-2常用）
+        max_new_tokens=50,   # 注意这里是 max_new_tokens BLIP-2常用
         num_beams=5,
         temperature=1.0
     )

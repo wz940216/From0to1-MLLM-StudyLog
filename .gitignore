@@ -5,6 +5,11 @@
 /week02_sft_lora_qlora/code/my_alpaca_val_dataset
 /week02_sft_lora_qlora/code/my_alpaca_train_dataset
 
+/dataset/alpaca-chinese-dataset
+/dataset/cifar-10-batches-py
+/dataset/coco128
+/dataset/COCOCaption
+/dataset/stanford_alpaca
 
 # Optional common ignores
 *.pyc

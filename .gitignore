@@ -1,6 +1,13 @@
 # Ignore dataset and model directories
 
-/models/
+/models/blip-image-captioning-base
+/models/blip2-flan-t5-xl
+/models/clip-vit-base-patch16
+/models/Llama-3.1-8B-Instruct
+/models/llava-1.5-7b-hf
+/models/Qwen1.5-1.8B-Chat
+
+
 /week02_sft_lora_qlora/code/Qwen1.5-1.8B-Chat-lora
 /week02_sft_lora_qlora/code/my_alpaca_val_dataset
 /week02_sft_lora_qlora/code/my_alpaca_train_dataset

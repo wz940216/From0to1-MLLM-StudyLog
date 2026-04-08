@@ -27,7 +27,7 @@
 ├── README.md
 ├── dataset               # 数据集本地目录
 ├── docs/
-│   ├── roadmap.md        # 本 README 中的 24 周计划可拆到这里
+│   ├── roadmap.md        # 本 README 中的 24 周计划
 │   ├── refs.md           # 论文 / 教程 / 博客等资料索引
 │   └── notes/            # 跨周的总结型笔记（对齐、安全、部署等专题）
 ├── models                # 模型本地目录

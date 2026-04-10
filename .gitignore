@@ -11,6 +11,9 @@
 /week02_sft_lora_qlora/code/Qwen1.5-1.8B-Chat-lora
 /week02_sft_lora_qlora/code/my_alpaca_val_dataset
 /week02_sft_lora_qlora/code/my_alpaca_train_dataset
+week05_blip_blip2_caption/blip_lora
+week05_blip_blip2_caption/outputs
+
 
 /dataset/alpaca-chinese-dataset
 /dataset/cifar-10-batches-py

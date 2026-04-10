@@ -53,6 +53,143 @@ m 通常是 0.995 / 0.999
 #### BLIP caption实验
 
 ```python
+from transformers import BlipProcessor, BlipForConditionalGeneration
+from PIL import Image
+import torch
+# ==============================
+# 1. 加载模型和预处理器
+# ==============================
+
+# BlipProcessor：负责把图片转换成模型可以理解的输入格式（如 tensor）
+processor = BlipProcessor.from_pretrained("models/blip-image-captioning-base")
+
+# BlipForConditionalGeneration：BLIP 图像描述生成模型
+model = BlipForConditionalGeneration.from_pretrained("models/blip-image-captioning-base")
+
+
+# ==============================
+# 2. 加载图片
+# ==============================
+
+# 这里使用本地图片路径（也可以是网络图片）
+img_url = "week05_blip_blip2_caption/code/000000039769.jpg"
+
+# 使用 PIL 打开图片，并转换为 RGB 格式（模型要求）
+image = Image.open(img_url).convert("RGB")
+
+
+# ==============================
+# 3. 预处理输入
+# ==============================
+
+# 将图片转换为 PyTorch tensor，并自动做 resize / normalize 等处理
+# return_tensors="pt" 表示返回 PyTorch 格式
+inputs = processor(images=image, return_tensors="pt")
+
+# inputs = processor(images=image, text="用中文描述这张图片：", return_tensors="pt")
+# ==============================
+# 4. 将模型和数据移动到 GPU
+# ==============================
+
+# 把模型加载到 GPU
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model.to(device)
+
+# 把输入数据也移动到 GPU
+inputs = {k: v.to(device) for k, v in inputs.items()}
+
+
+# ==============================
+# 5. 生成 caption
+# ==============================
+
+# generate 是文本生成核心函数
+out = model.generate(
+    **inputs,          # 输入图片特征
+    max_length=50,     # 生成文本的最大长度
+    num_beams=5,       # Beam Search
+    temperature=1.0    # 控制随机性（1.0为默认，越小越保守）
+)
+
+
+# ==============================
+# 6. 解码输出
+# ==============================
+
+# 将模型输出的 token id 转换为自然语言文本
+caption = processor.decode(out[0], skip_special_tokens=True)
+
+
+# ==============================
+# 7. 打印结果
+# ==============================
+
+print("Caption:", caption)
+
+```
+
+#### BeamSearch
+
+核心思想：
+每一步保留K个最优候选（K = num_beams）
+假设：
+num_beams = 2
+
+**Step 1**：保留概率最高的2个词:
+
+a (0.6)  
+the (0.4)  
+
+**Step 2**：扩展每个候选（计算的是条件概率）：  
+模型生成一句话 ( y = (y_1, y_2, ..., y_T) ) 的概率是：
+$$
+P(y) = P(y_1) \cdot P(y_2 | y_1) \cdot P(y_3 | y_1, y_2) \cdots P(y_T | y_1,...,y_{T-1})
+$$
+每一步都是**条件概率**
+a → a cat (0.3)  
+a → a dog (0.2)  
+the → the best (0.36)  
+the → the man (0.1)  
+计算方法，采用log相加的近似法  
+$$
+\log P(y) = \log P(y_1) + \log P(y_2|y_1) + \cdots
+$$
+实际排序用的是：
+$$
+\text{score} = \sum_{t=1}^{T} \log P(y_t | y_{<t})
+$$
+
+**Step 3**：从所有候选中选 Top k(例如k=2)：
+the best (0.36)
+a cat (0.3)
+**Step 4**：继续扩展……
+
+**num_beams**  
+优点  
+比 Greedy 更准确  
+能避免明显错误句子  
+更稳定，不像采样那么随机
+
+缺点  
+计算成本高  
+缺乏多样性，容易生成无聊句子  
+不一定全局最优，仍是近似搜索，
+
+## BLIP-2
+
+### Q-former
+
+Q-Former 不在每层使用 cross-attention，主要有三个原因：
+
+1. 避免过度依赖视觉信息，保证语义逐层抽象
+2. 保留语言模型结构，使输出更适配 LLM
+3. 降低计算复杂度，提高训练稳定性
+
+同时，间隔插入 cross-attention 可以形成
+“信息提取 + 语义融合”的交替过程，从而更高效地完成跨模态对齐。
+
+Qformer 拆解实验
+```python
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -304,71 +441,10 @@ def demo():
 
 if __name__ == "__main__":
     demo()
-
 ```
 
-#### BeamSearch
+### BLIP2 caption实验实验代码
 
-核心思想：
-每一步保留K个最优候选（K = num_beams）
-假设：
-num_beams = 2
-
-**Step 1**：保留概率最高的2个词:
-
-a (0.6)  
-the (0.4)  
-
-**Step 2**：扩展每个候选（计算的是条件概率）：  
-模型生成一句话 ( y = (y_1, y_2, ..., y_T) ) 的概率是：
-$$
-P(y) = P(y_1) \cdot P(y_2 | y_1) \cdot P(y_3 | y_1, y_2) \cdots P(y_T | y_1,...,y_{T-1})
-$$
-每一步都是**条件概率**
-a → a cat (0.3)
-a → a dog (0.2)
-the → the best (0.36)
-the → the man (0.1)
-计算方法，采用log相加的近似法
-$$
-\log P(y) = \log P(y_1) + \log P(y_2|y_1) + \cdots
-$$
-实际排序用的是：
-$$
-\text{score} = \sum_{t=1}^{T} \log P(y_t | y_{<t})
-$$
-
-**Step 3**：从所有候选中选 Top k(例如k=2)：
-the best (0.36)
-a cat (0.3)
-**Step 4**：继续扩展……
-
-**num_beams**  
-优点  
-比 Greedy 更准确  
-能避免明显错误句子  
-更稳定，不像采样那么随机
-
-缺点  
-计算成本高  
-缺乏多样性，容易生成无聊句子  
-不一定全局最优，仍是近似搜索，
-
-## BLIP-2
-
-#Q-former
-
-
-Q-Former 不在每层使用 cross-attention，主要有三个原因：
-
-1. 避免过度依赖视觉信息，保证语义逐层抽象
-2. 保留语言模型结构，使输出更适配 LLM
-3. 降低计算复杂度，提高训练稳定性
-
-同时，间隔插入 cross-attention 可以形成
-“信息提取 + 语义融合”的交替过程，从而更高效地完成跨模态对齐。
-
-#### BLIP2 caption实验实验代码
 ```python
 from transformers import Blip2Processor, Blip2ForConditionalGeneration
 from PIL import Image
@@ -436,6 +512,8 @@ caption = processor.decode(out[0], skip_special_tokens=True)
 print("Caption:", caption)
 ```
 
+## BLIP和BLIP2对比
+
 对比BLIP和BLIP2的结果令人吃惊  
 BLIP的输出：  
 two cats sleeping on a couch with a remote control  
@@ -456,6 +534,169 @@ BLIP2本质是在做 **视觉问答（VQA, Visual Question Answering）任务**
 而BLIP：是端到端训练的caption模型，更偏生成描述  
 BLIP更像是在看**图写话**，BLIP2更像是在**答题**
 
+## sft_BLIP
+
+```python
+import torch
+import json
+import os
+from torch.utils.data import Dataset, DataLoader
+from PIL import Image
+from transformers import BlipProcessor, BlipForConditionalGeneration, TrainingArguments, Trainer, default_data_collator
+from peft import LoraConfig, get_peft_model 
+
+# ======================
+# 1. 加载模型
+# ======================
+model_name = "models/blip-image-captioning-base"
+
+processor = BlipProcessor.from_pretrained(model_name)
+model = BlipForConditionalGeneration.from_pretrained(model_name)
+
+# ======================
+# 2. 冻结视觉编码器
+# ======================
+for param in model.vision_model.parameters():
+    param.requires_grad = False
+    
+# debug: 打印模型结构，确认视觉编码器部分被冻结，查看文本部分名字用于挂载 LoRA
+for name, module in model.named_modules():
+    print(name)
+    
+print("Vision encoder frozen ✅")
+
+# ======================
+# 3. 配置 LoRA（只作用在文本部分）
+# ======================
+lora_config = LoraConfig(
+    r=8,
+    lora_alpha=16,
+    target_modules=[
+        "query", "value",  # attention层
+    ],
+    
+    # 这里不能设置task_type，因为 虽然 BLIP 的文本部分是 encoder-decoder 结构，但是他是多模态模型，输入有pixcel_val 和 input_ids,
+    # 不能直接当作语言模型训练
+    # task_type后peft会自动在forward时构建一个inputs_embeds,和BlipForConditionalGeneration的输入不一致了。
+    lora_dropout=0.05,
+    bias="none",
+    # task_type="SEQ_2_SEQ_LM" 
+    
+)
 
 
+model = get_peft_model(model, lora_config)
+
+# debug: 打印可训练参数，确认 LoRA 已正确挂载在文本部分的 attention 层
+for name, param in model.named_parameters():
+    if param.requires_grad:
+        print(name)
+        
+model.print_trainable_parameters()
+
+# ======================
+# 4. 构造数据集
+# ======================
+
+class CocoCaptionDataset(Dataset):
+    def __init__(self, annotation_file, image_dir, processor):
+        """
+        annotation_file: captions_val2017.json
+        image_dir: val2017/
+        """
+        with open(annotation_file, 'r') as f:
+            coco = json.load(f)
+
+        self.image_dir = image_dir
+        self.processor = processor
+
+        # 构建 image_id -> file_name
+        self.id2file = {img["id"]: img["file_name"] for img in coco["images"]}
+
+        # 展平 annotations（每条 caption 作为一个样本）
+        self.samples = []
+        for ann in coco["annotations"]:
+            image_id = ann["image_id"]
+            caption = ann["caption"]
+            file_name = self.id2file[image_id]
+
+            self.samples.append((file_name, caption))
+
+        print(f"Loaded {len(self.samples)} samples")
+
+    def __len__(self):
+        return len(self.samples)
+
+    def __getitem__(self, idx):
+        file_name, caption = self.samples[idx]
+
+        img_path = os.path.join(self.image_dir, file_name)
+        image = Image.open(img_path).convert("RGB")
+
+        inputs = self.processor(
+            images=image,
+            text=caption,
+            padding="max_length",
+            truncation=True,
+            return_tensors="pt"
+        )
+
+        inputs = {k: v.squeeze(0) for k, v in inputs.items()}
+
+        # 将padding token的 label 设置为 -100，避免计算 loss 时对 padding 部分进行梯度更新
+        labels = inputs["input_ids"].clone()
+        labels[labels == self.processor.tokenizer.pad_token_id] = -100
+        inputs["labels"] = labels
+        
+        # debug: 打印输入的 shapes，确认视觉特征和文本输入正确
+        # for k,v in inputs.items():
+        #     print(k,inputs[k].shape)
+        
+        return inputs
+        
+
+dataset = CocoCaptionDataset("dataset/COCOCaption/annotations/captions_val2017.json", "dataset/COCOCaption/val2017", processor)
+
+# dataloader = DataLoader(dataset, batch_size=2, shuffle=True) 在trainer中会自动处理 dataloader，无需手动创建
+
+# ======================
+# 5. 训练
+# ======================
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model = model.to(device)
+
+# optimizer = torch.optim.AdamW(model.parameters(), lr=5e-5) trainer会自动创建优化器，无需手动创建
+
+model.train() 
+
+# 训练参数配置
+training_args = TrainingArguments(
+    output_dir="week05_blip_blip2_caption/sft_blip_outputs",
+    num_train_epochs=3,
+    per_device_train_batch_size=10,
+    logging_steps=10,
+    save_steps=500,
+    learning_rate=5e-5,
+
+    fp16=True,  # 或 bf16=True（如果支持）
+    gradient_accumulation_steps=1,
+)
+
+# Trainer 训练器
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=dataset,
+    tokenizer=processor.tokenizer, 
+    data_collator=default_data_collator,
+)
+
+# 开始训练
+trainer.train()
+
+# ======================
+# 6. 保存 LoRA 权重
+# ======================
+model.save_pretrained("week05_blip_blip2_caption/sft_blip_lora")
+```
 

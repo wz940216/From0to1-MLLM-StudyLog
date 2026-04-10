@@ -31,7 +31,7 @@ image = Image.open(img_url).convert("RGB")
 # return_tensors="pt" 表示返回 PyTorch 格式
 inputs = processor(images=image, return_tensors="pt")
 
-
+# inputs = processor(images=image, text="用中文描述这张图片：", return_tensors="pt")
 # ==============================
 # 4. 将模型和数据移动到 GPU
 # ==============================

@@ -29,8 +29,8 @@ image = Image.open(img_url).convert("RGB")
 
 prompt = "Question: Describe the image in detail. Answer:"
 
-inputs = processor(images=image, text=prompt, return_tensors="pt")
-
+# inputs = processor(images=image, text=prompt, return_tensors="pt")
+inputs = processor(images=image, text="用中文描述这张图片：", return_tensors="pt")
 # ==============================
 # 4. 将模型和数据移动到 GPU
 # ==============================

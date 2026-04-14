@@ -72,10 +72,10 @@
 | 天   | 学习内容                                                     | 目标               | 参考文档/论文                                           |
 | ---- | ------------------------------------------------------------ | ------------------ | ------------------------------------------------------- |
 | 周一 | 设计 Web Demo：功能&流程（上传图片 -> caption；文本 -> 检索图库图片） | 明确 demo 架构     | Gradio 文档<br>https://www.gradio.app/guides/quickstart |
-| 周二 | 使用 Gradio/FastAPI + 前端实现图片上传 & 调 CLIP 检索        | 搭出初版前后端     | FastAPI 文档<br>https://fastapi.tiangolo.com/           |
-| 周三 | 接入 BLIP caption：图片 -> caption -> 在页面展示             | Web 上展示 caption | —                                                       |
+| 周二 | 使用(Gradio/FastAPI+前端)实现图片上传&调CLIP检索        | 搭出初版前后端     | FastAPI 文档<br>https://fastapi.tiangolo.com/           |
+| 周三 | 接入BLIPcaption：图片->caption->在页面展示             | Web 上展示 caption | —                                                       |
 | 周四 | 优化：预计算图库 embedding、batch 推理；简单 UI 调整         | 提升性能 & 体验    | —                                                       |
-| 周五 | 做几组测试，记录检索和 caption 效果                          | 验证 demo 实用性   | —                                                       |
+| 周五 | 做几组测试，记录检索和caption效果                          | 验证 demo 实用性   | —                                                       |
 | 周六 | 写 README：项目介绍、使用方式、技术栈                        | 输出可展示的小项目 | —                                                       |
 
 ---

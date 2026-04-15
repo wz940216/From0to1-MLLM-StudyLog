@@ -27,7 +27,7 @@ def batch_caption(images):
 # -------------------
 
 # 图库目录 加载图像特征
-image_dir = os.path.join(ROOT_DIR, "dataset", "coco128", "images", "train2017")
+image_dir = os.path.join(ROOT_DIR, "dataset", "COCOCaption", "val2017")
 image_paths = [os.path.join(image_dir, f) for f in os.listdir(image_dir) if f.endswith(".jpg")]
 image_index_path = os.path.join(ROOT_DIR, "week06_clip_blip_web_demo", "image_index.pt")
 # 如果索引文件不存在，则构建索引并保存

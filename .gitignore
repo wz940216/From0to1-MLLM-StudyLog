@@ -13,6 +13,7 @@
 /week02_sft_lora_qlora/code/my_alpaca_train_dataset
 week05_blip_blip2_caption/blip_lora
 week05_blip_blip2_caption/outputs
+week06_clip_blip_web_demo/image_index.pt
 
 
 /dataset/alpaca-chinese-dataset

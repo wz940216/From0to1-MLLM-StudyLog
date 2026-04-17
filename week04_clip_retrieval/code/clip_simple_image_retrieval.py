@@ -76,7 +76,7 @@ def retrieve_topk(query, image_features, image_paths, topk=3):
     for score, idx in zip(topk_scores[0], topk_indices[0]):
         results.append({
             "image_path": image_paths[idx],
-            "score": score.item()
+            "score": f"{score.item():.4f}"
         })
 
     return results

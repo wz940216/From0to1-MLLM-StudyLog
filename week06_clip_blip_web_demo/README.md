@@ -27,7 +27,7 @@
 1. 切换到项目根目录：
 
 ```bash
-cd /root/zheng/code/mllm/week06_clip_blip_web_demo/code
+cd week06_clip_blip_web_demo/code
 ```
 
 2. 安装依赖（如尚未安装）：

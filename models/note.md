@@ -18,4 +18,5 @@ hf download Salesforce/blip2-flan-t5-xl --local-dir models/blip2-flan-t5-xl
 hf download openai/clip-vit-base-patch16 --local-dir models/clip-vit-base-patch16
 hf download llava-hf/llava-1.5-7b-hf --local-dir models/llava-1.5-7b-hf
 hf download Qwen/Qwen1.5-1.8B-Chat --local-dir models/Qwen1.5-1.8B-Chat
+hf download Qwen/Qwen1.5-1.8B --local-dir models/Qwen1.5-1.8B
 ```

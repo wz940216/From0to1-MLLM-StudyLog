@@ -298,4 +298,6 @@ if __name__ == "__main__":
     
 ```
 
+比较有意思的是，我在调试代码过程中，发现llm模型的outputs中除了logits和loss，还有一个past_key_values。代表self attention时的k v缓存，每一次前向，llm只做新增token的attention，而将之前计算好的k和v存在past_key_values中，可以加快模型的推理速度。后续的week17会进一步一起探讨和研究llm的部署加速策略。  
+
 总体来说llava的结构非常简洁，但拼接过程中有些细节需要重点处理，例如提取哪些视觉特征，如何拼接视觉和文本embedding，如何制作label和attentionmask等。

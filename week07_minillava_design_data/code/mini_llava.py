@@ -1,15 +1,22 @@
 import torch
 from vision_encoder import VisionEncoder
 from llm_decoder import LLMDecoder, Projector
+import yaml
 
 class MiniLlavaModel(torch.nn.Module):
-    def __init__(self, vision_encoder_model_path, language_decoder_model_path, device="cuda"):
+    def __init__(self, config_path):
         super(MiniLlavaModel, self).__init__()
-        self.vision_encoder = VisionEncoder(model_path=vision_encoder_model_path, device=device)
-        self.language_decoder = LLMDecoder(model_path=language_decoder_model_path, device=device)
-        self.projector = Projector(input_dim=768, hidden_dim=2048, output_dim=self.language_decoder.model.config.hidden_size).to(device)
-        self.device = device
-        
+        self.config = self.load_config(config_path)
+        self.vision_encoder = VisionEncoder(model_path=self.config['MINILLAVA']['VISION_ENCODER']['MODEL_PATH'], freeze=self.config['MINILLAVA']['VISION_ENCODER']['FREEZE'], device=self.config['DEVICE'])
+        self.language_decoder = LLMDecoder(model_path=self.config['MINILLAVA']['LLM_DECODER']['MODEL_PATH'], device=self.config['DEVICE'])
+        self.projector = Projector(input_dim=self.config['MINILLAVA']['PROJECTOR']['INPUT_DIM'], hidden_dim=self.config['MINILLAVA']['PROJECTOR']['HIDDEN_DIM'], output_dim=self.language_decoder.model.config.hidden_size).to(self.config['DEVICE'])
+        self.device = self.config['device']
+
+    def load_config(self,config_path):
+        with open(config_path, 'r') as f:
+            config = yaml.safe_load(f)
+        return config
+
     def forward(self, images, texts):
         # 图片特征
         image_features = self.vision_encoder(images)
@@ -41,7 +48,7 @@ class MiniLlavaModel(torch.nn.Module):
         return outputs
     
 if __name__ == "__main__":
-    model = MiniLlavaModel(vision_encoder_model_path="models/clip-vit-base-patch16", language_decoder_model_path="models/Qwen1.5-1.8B", device="cuda")
+    model = MiniLlavaModel(config_path="week07_minillava_design_data/code/config.yaml")
     from PIL import Image
     image = Image.open("dataset/coco128/images/train2017/000000000009.jpg").convert("RGB")
     dummy_images = [image,image,image]  # Simulating a batch of 3 images

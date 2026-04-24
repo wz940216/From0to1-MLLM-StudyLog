@@ -26,11 +26,16 @@ class Projector(nn.Module):
 
 
 class LLMDecoder(torch.nn.Module):
-    def __init__(self, model_path, device="cuda"):
+    def __init__(self, model_path, freeze=False, device="cuda"):
         super().__init__()
         self.model = AutoModelForCausalLM.from_pretrained(model_path).to(device)
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+        self.freeze = freeze
         self.device = device
+        
+        if freeze:
+            for param in self.model.parameters():
+                param.requires_grad = False
 
     def get_input_embeddings(self):
         return self.model.get_input_embeddings()

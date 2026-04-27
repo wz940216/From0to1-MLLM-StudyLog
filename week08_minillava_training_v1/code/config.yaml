@@ -1,0 +1,109 @@
+
+# MiniLLaVA 配置文件
+# 用于参数化配置模型的所有参数
+
+# 基础配置
+DEVICE: "cuda"  # 运行设备: "cuda" 或 "cpu"
+
+# 模型配置
+MINILLAVA:
+  # 视觉编码器配置
+  VISION_ENCODER:
+    MODEL_PATH: "models/clip-vit-base-patch16"  # CLIP ViT 模型路径
+    FREEZE: true  # 是否冻结视觉编码器参数
+    OUTPUT_DIM: 768  # 视觉特征维度 (CLIP ViT base patch16)
+
+  # 语言解码器配置
+  LLM_DECODER:
+    MODEL_PATH: "models/Qwen1.5-1.8B"  # LLM 模型路径
+    FREEZE: false  # 是否冻结LLM参数 (通常训练时解冻)
+    MAX_NEW_TOKENS: 512  # 生成时最大新token数
+    TEMPERATURE: 0.7  # 生成温度
+    DO_SAMPLE: true  # 是否采样生成
+
+  # 投影层配置 (将视觉特征映射到语言空间)
+  PROJECTOR:
+    INPUT_DIM: 768  # 输入维度 (视觉特征)
+    HIDDEN_DIM: 2048  # 隐藏层维度
+
+# 数据配置
+DATA:
+  # 训练数据
+  TRAIN_DATASET:
+    PATH: "dataset/LLaVA-CC3M-Pretrain-595K"  # 数据集路径
+    IMAGE_DIR: "images"  # 图片目录
+    ANNOTATION_FILE: "chat.json"  # 标注文件
+    MAX_LENGTH: 512  # 最大序列长度
+    BATCH_SIZE: 4  # 批大小
+    NUM_WORKERS: 4  # 数据加载器工作进程数
+
+  # 验证数据 (可选)
+  VAL_DATASET:
+    PATH: "dataset/coco128"  # 验证数据集路径
+    BATCH_SIZE: 4
+
+  # 数据预处理
+  PREPROCESS:
+    IMAGE_SIZE: 224  # 图片resize大小
+    MAX_TEXT_LENGTH: 512  # 最大文本长度
+
+# 训练配置
+TRAINING:
+  # 优化器配置
+  OPTIMIZER:
+    TYPE: "adamw"  # 优化器类型: adamw, adam, sgd
+    LR: 1e-4  # 学习率
+    WEIGHT_DECAY: 0.01  # 权重衰减
+    BETAS: [0.9, 0.999]  # Adam betas
+
+  # 学习率调度器
+  SCHEDULER:
+    TYPE: "cosine"  # 调度器类型: cosine, linear, constant
+    WARMUP_STEPS: 100  # 预热步数
+    NUM_EPOCHS: 3  # 训练轮数
+
+  # 梯度裁剪
+  GRAD_CLIP:
+    MAX_NORM: 1.0  # 最大梯度范数
+
+  # 检查点保存
+  CHECKPOINT:
+    SAVE_DIR: "week07_minillava_design_data/outputs/checkpoints"  # 保存目录
+    SAVE_STEPS: 500  # 每多少步保存一次
+    SAVE_TOTAL_LIMIT: 3  # 最多保存多少个检查点
+
+  # 日志配置
+  LOGGING:
+    LOG_DIR: "week07_minillava_design_data/outputs/logs"  # 日志目录
+    LOG_STEPS: 10  # 每多少步记录一次
+
+# 推理配置
+INFERENCE:
+  # 生成参数
+  GENERATION:
+    MAX_NEW_TOKENS: 512
+    TEMPERATURE: 0.7
+    DO_SAMPLE: true
+    TOP_P: 0.9
+    TOP_K: 50
+    REPETITION_PENALTY: 1.1
+
+  # 批处理
+  BATCH_SIZE: 1  # 推理批大小
+
+# 其他配置
+MISC:
+  SEED: 42  # 随机种子
+  DEBUG: false  # 调试模式
+  RESUME_FROM: null  # 从检查点恢复训练 (路径或null)
+
+
+  
+
+
+
+
+
+
+
+

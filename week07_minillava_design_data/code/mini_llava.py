@@ -5,7 +5,7 @@ import yaml
 
 
 class MiniLlavaModel(torch.nn.Module):
-    """MiniLLaVA。
+    """MiniLLaVA
 
     模型由三部分组成：
     1. CLIP Vision Encoder：把图片编码成 patch 特征。

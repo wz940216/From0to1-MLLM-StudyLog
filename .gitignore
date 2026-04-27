@@ -23,6 +23,7 @@ week06_clip_blip_web_demo/image_index.pt
 /dataset/COCOCaption
 /dataset/stanford_alpaca
 dataset/LLaVA-CC3M-Pretrain-595K
+dataset/dataset.tar.gz
 
 # Optional common ignores
 *.pyc

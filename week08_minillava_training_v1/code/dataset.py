@@ -25,7 +25,7 @@ def build_prompt(question):
     Qwen chat template，但要保证训练和推理使用同一套格式。
     """
     question = _clean_text(question)
-    return f"用户：{question}\n助手："
+    return f"User：{question}\nAssistant"
 
 
 def extract_qa(conversations):
@@ -65,16 +65,25 @@ class LlavaPretrainDataset(Dataset):
         return len(self.samples)
 
     def __getitem__(self, index):
-        item = self.samples[index]
-        image_path = os.path.join(self.image_dir, item["image"])
-        image = Image.open(image_path).convert("RGB")
-        question, answer = extract_qa(item["conversations"])
-        return {
-            "image": image,
-            "prompt": build_prompt(question),
-            "answer": answer,
-            "image_path": image_path
-        }
+        for offset in range(len(self.samples)):
+            sample_index = (index + offset) % len(self.samples)
+            item = self.samples[sample_index]
+            image_path = os.path.join(self.image_dir, item["image"])
+            try:
+                image = Image.open(image_path).convert("RGB")
+            except Exception as e:
+                # print(f"无法打开图片文件 {image_path}，将换一张图片。异常信息：{e}")
+                continue
+
+            question, answer = extract_qa(item["conversations"])
+            return {
+                "image": image,
+                "prompt": build_prompt(question),
+                "answer": answer,
+                "image_path": image_path
+            }
+
+        raise RuntimeError("所有样本图片都无法打开，请检查图片目录和标注文件。")
 
 
 @dataclass
@@ -89,6 +98,10 @@ class LlavaCollator:
 
     tokenizer: object
     max_length: int = 512
+
+    def __post_init__(self):
+        if self.tokenizer is None:
+            raise ValueError("LlavaCollator 需要传入 tokenizer，不能为 None。")
 
     def __call__(self, features):
         images = [x["image"] for x in features]
@@ -129,3 +142,15 @@ class LlavaCollator:
             "attention_mask": tokenized.attention_mask,
             "labels": labels
         }
+
+
+if __name__ == "__main__":
+    dataset = LlavaPretrainDataset(
+        dataset_path="dataset/LLaVA-CC3M-Pretrain-595K",
+        image_dir="images",
+        annotation_file="chat.json",
+        max_samples=1
+    )
+    sample = dataset[0]
+    print(sample.keys())
+    print(sample["image"], sample["prompt"], sample["answer"])

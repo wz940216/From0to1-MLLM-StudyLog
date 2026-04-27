@@ -16,7 +16,7 @@ MINILLAVA:
   # 语言解码器配置
   LLM_DECODER:
     MODEL_PATH: "models/Qwen1.5-1.8B"  # LLM 模型路径
-    FREEZE: false  # 是否冻结LLM参数 (通常训练时解冻)
+    FREEZE: true  # 是否冻结LLM参数 (通常训练时解冻)
     MAX_NEW_TOKENS: 512  # 生成时最大新token数
     TEMPERATURE: 0.7  # 生成温度
     DO_SAMPLE: true  # 是否采样生成
@@ -68,13 +68,13 @@ TRAINING:
 
   # 检查点保存
   CHECKPOINT:
-    SAVE_DIR: "week07_minillava_design_data/outputs/checkpoints"  # 保存目录
+    SAVE_DIR: "week08_minillava_training_v1/outputs/checkpoints"  # 保存目录
     SAVE_STEPS: 500  # 每多少步保存一次
     SAVE_TOTAL_LIMIT: 3  # 最多保存多少个检查点
 
   # 日志配置
   LOGGING:
-    LOG_DIR: "week07_minillava_design_data/outputs/logs"  # 日志目录
+    LOG_DIR: "week08_minillava_training_v1/outputs/logs"  # 日志目录
     LOG_STEPS: 10  # 每多少步记录一次
 
 # 推理配置

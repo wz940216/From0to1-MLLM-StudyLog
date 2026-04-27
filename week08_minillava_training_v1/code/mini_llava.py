@@ -5,7 +5,7 @@ import yaml
 
 
 class MiniLlavaModel(torch.nn.Module):
-    """MiniLLaVA。
+    """MiniLLaVA
 
     模型由三部分组成：
     1. CLIP Vision Encoder：把图片编码成 patch 特征。
@@ -116,7 +116,7 @@ class MiniLlavaModel(torch.nn.Module):
             inputs_embeds=inputs_embeds,
             attention_mask=combined_attention_mask,
             labels=labels,
-            use_cache=False
+            use_cache=False # 训练时不启用kv catche
         )
         return outputs
 

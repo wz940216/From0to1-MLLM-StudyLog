@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from transformers import AutoModelForCausalLM, AutoTokenizer
-
+from peft import LoraConfig, TaskType, get_peft_model
 
 class Projector(nn.Module):
     """把 CLIP 视觉特征映射到 LLM 词向量空间的两层 MLP。
@@ -35,17 +35,31 @@ class Projector(nn.Module):
 
 
 class LLMDecoder(torch.nn.Module):
-    def __init__(self, model_path, freeze=False, device="cuda"):
+    def __init__(self, model_path, r=8, lora_alpha=32, lora_dropout=0.1, freeze=False, device="cuda"):
         super().__init__()
         if device == "cuda" and not torch.cuda.is_available():
             device = "cpu"
         self.device = torch.device(device)
-
+        
         # trust_remote_code=True 兼容部分国产模型仓库的自定义实现；本地官方 Qwen 也可正常加载。
         self.model = AutoModelForCausalLM.from_pretrained(
             model_path,
             trust_remote_code=True
         ).to(self.device)
+        
+        if r != 'None':
+            # LoRA 参数配置
+            self.peft_config = LoraConfig(
+                task_type=TaskType.CAUSAL_LM,
+                inference_mode=False,
+                r=r,
+                lora_alpha=lora_alpha,
+                lora_dropout=lora_dropout,
+            )
+            # 包装成 PEFT LoRA 模型
+            self.model = get_peft_model(self.model, self.peft_config)
+            freeze = False  # 使用 LoRA 时通常不冻结原模型参数，允许它们在训练中更新以配合 LoRA 调整。
+        
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
         if self.tokenizer.pad_token_id is None:
             # 因果语言模型常常没有 pad token。训练 batch padding 时复用 eos 最稳妥。
@@ -56,6 +70,7 @@ class LLMDecoder(torch.nn.Module):
             self.model.eval()
             for param in self.model.parameters():
                 param.requires_grad = False
+        
 
     def get_input_embeddings(self):
         return self.model.get_input_embeddings()

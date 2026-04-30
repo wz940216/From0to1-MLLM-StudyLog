@@ -24,6 +24,9 @@ class MiniLlavaModel(torch.nn.Module):
             device=str(self.device)
         )
         self.language_decoder = LLMDecoder(
+            r=self.config["MINILLAVA"]["LLM_DECODER"].get("LORA_R", 8),
+            lora_alpha=self.config["MINILLAVA"]["LLM_DECODER"].get("LORA_ALPHA", 32),
+            lora_dropout=self.config["MINILLAVA"]["LLM_DECODER"].get("LORA_DROPOUT", 0.1),
             model_path=self.config["MINILLAVA"]["LLM_DECODER"]["MODEL_PATH"],
             freeze=self.config["MINILLAVA"]["LLM_DECODER"].get("FREEZE", False),
             device=str(self.device)

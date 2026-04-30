@@ -17,6 +17,9 @@ MINILLAVA:
   LLM_DECODER:
     MODEL_PATH: "models/Qwen1.5-1.8B"  # LLM 模型路径
     FREEZE: true  # 是否冻结LLM参数 (通常训练时解冻)
+    LORA_R: 8 # None表示不使用lora
+    LORA_ALPHA: 32
+    LORA_DROPOUT: 0.1
     MAX_NEW_TOKENS: 512  # 生成时最大新token数
     TEMPERATURE: 0.7  # 生成温度
     DO_SAMPLE: true  # 是否采样生成
@@ -34,7 +37,7 @@ DATA:
     IMAGE_DIR: "images"  # 图片目录
     ANNOTATION_FILE: "chat.json"  # 标注文件
     MAX_LENGTH: 512  # 最大序列长度
-    BATCH_SIZE: 4  # 批大小
+    BATCH_SIZE: 1  # 批大小
     NUM_WORKERS: 4  # 数据加载器工作进程数
 
   # 验证数据 (可选)

@@ -54,7 +54,7 @@ def build_optimizer(model, config):
     # Adam 不使用 AdamW 的解耦权重衰减，适合简单调试或对比实验。
     if optim_type == "adam":
         return torch.optim.Adam(params, lr=float(optim_config["LR"]))
-    # SGD 一般不用于 LLM 微调，但保留入口便于教学实验。
+    # SGD 一般不用于 LLM 微调，但保留入口便于实验。
     if optim_type == "sgd":
         return torch.optim.SGD(params, lr=float(optim_config["LR"]), momentum=0.9)
     raise ValueError(f"不支持的优化器类型: {optim_type}")
@@ -78,6 +78,12 @@ def build_scheduler(optimizer, config, total_steps):
     raise ValueError(f"不支持的调度器类型: {sched_type}")
 
 
+def should_save_param(name, param):
+    """checkpoint 中保留可训练参数和 LoRA adapter 参数。"""
+    name = name.lower()
+    return param.requires_grad or "lora_" in name or ".lora_" in name
+
+
 def save_checkpoint(accelerator, model, optimizer, scheduler, step, save_dir):
     """保存训练检查点，包含 projector、可训练参数和优化器状态。"""
     # 多卡训练时每个进程都会执行代码；只让主进程写文件，避免多个进程同时覆盖同一路径。
@@ -88,13 +94,26 @@ def save_checkpoint(accelerator, model, optimizer, scheduler, step, save_dir):
     ckpt_path = os.path.join(save_dir, f"step_{step}.pt")
     # prepare 后的 model 可能被 DDP/FSDP 等包装；保存前要取回原始模型对象。
     unwrapped_model = accelerator.unwrap_model(model)
+    # 只保存开启梯度的参数和 LoRA adapter 参数，冻结的基础模型权重由初始化模型提供。
+    saved_param_names = [
+        name
+        for name, param in unwrapped_model.named_parameters()
+        if should_save_param(name, param)
+    ]
+    saved_state_dict = {
+        name: param.detach().cpu()
+        for name, param in unwrapped_model.named_parameters()
+        if should_save_param(name, param)
+    }
     # accelerator.save 会在分布式环境中安全保存对象，语义类似 torch.save。
     accelerator.save(
         {
             # 记录当前全局步数，方便后续恢复或排查 checkpoint 来源。
             "step": step,
-            # 保存完整模型 state_dict，包括视觉编码器、projector、语言模型中未冻结/已冻结参数。
-            "model": unwrapped_model.state_dict(),
+            # 只保存部分参数；加载时用参数名称匹配，并允许未保存的冻结参数缺失。
+            "model": saved_state_dict,
+            # 显式记录保存了哪些参数，便于检查 checkpoint 内容。
+            "saved_param_names": saved_param_names,
             # 保存优化器状态，恢复训练时可以延续动量等内部统计量。
             "optimizer": optimizer.state_dict(),
             # constant scheduler 为 None，其它 scheduler 保存状态用于恢复学习率进度。
@@ -103,14 +122,13 @@ def save_checkpoint(accelerator, model, optimizer, scheduler, step, save_dir):
         ckpt_path
     )
     print(f"已保存检查点: {ckpt_path}")
-    # TODO: 改成只保存开启梯度的参数，加载的时候根据名称加载。减小 checkpoint 大小，提升保存和加载速度。
 
 
 def main():
     # 命令行参数只保留配置路径和调试样本数，其他训练参数统一放在 YAML 中管理。
     parser = argparse.ArgumentParser(description="MiniLLaVA 微调脚本")
     parser.add_argument("--config", default="week08_minillava_training_v1/code/config.yaml", help="训练配置文件路径")
-    parser.add_argument("--max-samples", type=int, default=None, help="调试时只取前 N 条数据")
+    parser.add_argument("--max-samples", type=int, default=1000, help="调试时只取前 N 条数据")
     args = parser.parse_args()
 
     # Accelerator 会根据 accelerate launch 的启动方式自动识别进程数、设备和分布式后端。
@@ -170,13 +188,7 @@ def main():
     # global_step 记录当前进程执行的优化步数；多卡下各进程同步前进。
     global_step = 0
     for epoch in range(num_epochs):
-        # tqdm 只在本机主进程显示，避免多进程同时刷进度条导致终端输出混乱。
-        progress = tqdm(
-            dataloader,
-            desc=f"epoch {epoch + 1}/{num_epochs}",
-            disable=not accelerator.is_local_main_process
-        )
-        for batch in progress:
+        for batch in dataloader:
             # batch 来自 LlavaCollator：
             # images 是 PIL 图片列表，input_ids/attention_mask/labels 是已 padding 的张量。
             outputs = model(
@@ -203,13 +215,12 @@ def main():
             global_step += 1
             # 聚合所有进程上的 loss，日志展示的是多卡平均 loss，而不是单个进程的局部 loss。
             loss_value = accelerator.gather_for_metrics(loss.detach()).mean().item()
-            progress.set_postfix(loss=f"{loss_value:.4f}")
-
+            
             # 只让全局主进程打印日志，避免多进程重复输出相同 step。
             if global_step % log_steps == 0 and accelerator.is_main_process:
                 lr = optimizer.param_groups[0]["lr"]
-                print(f"step={global_step} loss={loss_value:.4f} lr={lr:.8f}")
-
+                print(f"epoch {epoch + 1}/{num_epochs} step={global_step} loss={loss_value:.4f} lr={lr:.8f}")
+                
             # 到达保存间隔时，先等待所有进程到同一步，再由主进程写 checkpoint。
             if global_step % save_steps == 0:
                 accelerator.wait_for_everyone()
@@ -222,5 +233,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # 直接运行脚本或通过 accelerate launch 启动时都会进入这里。
     main()

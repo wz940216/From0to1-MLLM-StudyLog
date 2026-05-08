@@ -1,30 +1,29 @@
 # Ignore dataset and model directories
 
-/models/blip-image-captioning-base
-/models/blip2-flan-t5-xl
-/models/clip-vit-base-patch16
-/models/Llama-3.1-8B-Instruct
-/models/llava-1.5-7b-hf
-/models/Qwen1.5-1.8B-Chat
+models/blip-image-captioning-base
+models/blip2-flan-t5-xl
+models/clip-vit-base-patch16
+models/Llama-3.1-8B-Instruct
+models/llava-1.5-7b-hf
+models/Qwen1.5-1.8B-Chat
 models/Qwen1.5-1.8B
 
-
-/week02_sft_lora_qlora/code/Qwen1.5-1.8B-Chat-lora
-/week02_sft_lora_qlora/code/my_alpaca_val_dataset
-/week02_sft_lora_qlora/code/my_alpaca_train_dataset
+week02_sft_lora_qlora/code/Qwen1.5-1.8B-Chat-lora
+week02_sft_lora_qlora/code/my_alpaca_val_dataset
+week02_sft_lora_qlora/code/my_alpaca_train_dataset
 week05_blip_blip2_caption/blip_lora
 week05_blip_blip2_caption/outputs
 week06_clip_blip_web_demo/image_index.pt
 week08_minillava_training_v1/outputs
 
-
-/dataset/alpaca-chinese-dataset
-/dataset/cifar-10-batches-py
-/dataset/coco128
-/dataset/COCOCaption
-/dataset/stanford_alpaca
+dataset/alpaca-chinese-dataset
+dataset/cifar-10-batches-py
+dataset/coco128
+dataset/COCOCaption
+dataset/stanford_alpaca
 dataset/LLaVA-CC3M-Pretrain-595K
 dataset/dataset.tar.gz
+dataset/VQA
 
 # Optional common ignores
 *.pyc

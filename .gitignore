@@ -22,7 +22,6 @@ dataset/coco128
 dataset/COCOCaption
 dataset/stanford_alpaca
 dataset/LLaVA-CC3M-Pretrain-595K
-dataset/dataset.tar.gz
 dataset/VQA
 
 # Optional common ignores

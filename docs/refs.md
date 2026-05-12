@@ -9,3 +9,6 @@ https://zhuanlan.zhihu.com/p/649132737
 https://binaryoracle.github.io/MMLLM/庖丁解牛BLIP2.html#模型结构
 
 https://zhuanlan.zhihu.com/p/28392731664
+
+https://www.dongaigc.com/a/s2-wrapper-simple-powerful-multiscale-feature-extraction
+

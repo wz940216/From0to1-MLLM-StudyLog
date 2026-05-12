@@ -37,7 +37,7 @@ DATA:
     IMAGE_DIR: "images"  # 图片目录
     ANNOTATION_FILE: "chat.json"  # 标注文件
     MAX_LENGTH: 512  # 最大序列长度
-    BATCH_SIZE: 1  # 批大小
+    BATCH_SIZE: 8  # 批大小
     NUM_WORKERS: 4  # 数据加载器工作进程数
 
   # 验证数据 (可选)

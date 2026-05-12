@@ -55,8 +55,8 @@ class LlavaPretrainDataset(Dataset):
 
     def __init__(self, dataset_path, image_dir, annotation_file, max_samples=None):
         self.dataset_path = dataset_path
-        self.image_dir = os.path.join(dataset_path, image_dir)
-        annotation_path = os.path.join(dataset_path, annotation_file)
+        self.image_dir = os.path.join(self.dataset_path, image_dir)
+        annotation_path = os.path.join(self.dataset_path, annotation_file)
         self.samples = _read_json(annotation_path)
         if max_samples is not None:
             self.samples = self.samples[:max_samples]
@@ -65,25 +65,22 @@ class LlavaPretrainDataset(Dataset):
         return len(self.samples)
 
     def __getitem__(self, index):
-        for offset in range(len(self.samples)):
-            sample_index = (index + offset) % len(self.samples)
-            item = self.samples[sample_index]
-            image_path = os.path.join(self.image_dir, item["image"])
-            try:
-                image = Image.open(image_path).convert("RGB")
-            except Exception as e:
-                # print(f"无法打开图片文件 {image_path}，将换一张图片。异常信息：{e}")
-                continue
 
+        item = self.samples[index]
+        image_path = os.path.join(self.image_dir, item["image"])
+        try:
+            image = Image.open(image_path).convert("RGB")
             question, answer = extract_qa(item["conversations"])
-            return {
-                "image": image,
-                "prompt": build_prompt(question),
-                "answer": answer,
-                "image_path": image_path
-            }
-
-        raise RuntimeError("所有样本图片都无法打开，请检查图片目录和标注文件。")
+        except Exception as e:
+            # print(f"无法打开图片文件 {image_path}，将换一张图片。异常信息：{e}")
+            print(f"getitem error {e}")
+            
+        return {
+            "image": image,
+            "prompt": build_prompt(question),
+            "answer": answer,
+            "image_path": image_path
+        }
 
 
 @dataclass

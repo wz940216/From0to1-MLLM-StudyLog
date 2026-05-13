@@ -71,13 +71,13 @@ TRAINING:
 
   # 检查点保存
   CHECKPOINT:
-    SAVE_DIR: "week08_minillava_training_v1/outputs/checkpoints"  # 保存目录
+    SAVE_DIR: "week09_minillava_refactor/outputs/checkpoints"  # 保存目录
     SAVE_STEPS: 500  # 每多少步保存一次
     SAVE_TOTAL_LIMIT: 3  # 最多保存多少个检查点
 
   # 日志配置
   LOGGING:
-    LOG_DIR: "week08_minillava_training_v1/outputs/logs"  # 日志目录
+    LOG_DIR: "week09_minillava_refactor/outputs/logs"  # 日志目录
     LOG_STEPS: 10  # 每多少步记录一次
 
 # 推理配置

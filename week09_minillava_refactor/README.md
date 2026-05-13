@@ -1,7 +1,7 @@
 # MiniLLaVA Refactored (Week09)
 
 基于 LLaVA 设计思路的轻量多模态大模型训练与推理框架。  
-项目对 [Week08](../week08_minillava_training_v1) 的代码进行了**重构**，采用 Accelerate + 模块化设计，训练流程更清晰、扩展性更好。
+项目对 [Week08](../week08_minillava_training_v1) 的代码进行了**重构**，完善 Accelerate + 模块化设计，训练流程更清晰、扩展性更好。
 
 ---
 
@@ -134,9 +134,9 @@ python week09_minillava_refactor/code/infer.py \
 ## 模型架构
 
 ```
-图片 (PIL)
-  │
-  ▼
+      图片 (PIL)
+         │
+         ▼
 ┌─────────────────┐
 │ CLIP Vision ViT │  ← 冻结，提取 patch 特征 (B, 196, 768)
 └────────┬────────┘

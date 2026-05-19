@@ -1,4 +1,4 @@
-# MiniLLaVA Refactored (Week09)
+# MiniLLaVA Refactored
 
 基于 LLaVA 设计思路的轻量多模态大模型训练与推理框架。  
 项目对 [Week08](../week08_minillava_training_v1) 的代码进行了**重构**，完善 Accelerate + 模块化设计，训练流程更清晰、扩展性更好。

@@ -195,7 +195,7 @@ def main():
     # 命令行参数只保留配置路径和调试样本数，其他训练参数统一放在 YAML 中管理。
     parser = argparse.ArgumentParser(description="MiniLLaVA 微调脚本")
     parser.add_argument("--config", default="week10_multitask_data/code/config.yaml", help="训练配置文件路径")
-    parser.add_argument("--max-samples", type=int, default=1000, help="调试时只取前 N 条数据")
+    parser.add_argument("--max-samples", type=int, default=None, help="调试时只取前 N 条数据")
     args = parser.parse_args()
 
     # Accelerator 会根据 accelerate launch 的启动方式自动识别进程数、设备和分布式后端。

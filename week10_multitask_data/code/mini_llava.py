@@ -69,7 +69,8 @@ class MiniLlavaModel(torch.nn.Module):
         row_embeddings = []
         row_attention_masks = []
         row_labels = [] if labels is not None else None
-
+        
+        # batch 内每条样本单独处理，找到 <image> token 位置，在那里插入视觉特征，并调整 attention mask 和 labels。
         for row_idx in range(input_ids.size(0)):
             image_positions = (input_ids[row_idx] == image_token_id).nonzero(as_tuple=False).flatten()
             if image_positions.numel() != 1:
@@ -121,6 +122,8 @@ class MiniLlavaModel(torch.nn.Module):
 
         max_length = max(row_embedding.size(0) for row_embedding in row_embeddings)
         hidden_size = row_embeddings[0].size(-1)
+        
+        # batch 内不同样本的长度可能不一样，这里统一 pad 到 max_length。视觉特征部分的 padding 不会被 attention mask 和 labels 关注到。
         combined_inputs = projected_image_features.new_zeros(
             len(row_embeddings),
             max_length,

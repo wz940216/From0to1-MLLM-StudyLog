@@ -15,6 +15,8 @@ week05_blip_blip2_caption/blip_lora
 week05_blip_blip2_caption/outputs
 week06_clip_blip_web_demo/image_index.pt
 week08_minillava_training_v1/outputs
+week10_multitask_data/outputs
+
 
 dataset/alpaca-chinese-dataset
 dataset/cifar-10-batches-py
@@ -23,6 +25,9 @@ dataset/COCOCaption
 dataset/stanford_alpaca
 dataset/LLaVA-CC3M-Pretrain-595K
 dataset/VQA
+
+
+AGENT.md
 
 # Optional common ignores
 *.pyc

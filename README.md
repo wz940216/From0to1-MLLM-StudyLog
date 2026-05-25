@@ -321,6 +321,6 @@ pip install -r requirements.txt
 
 <div style="text-align: center;">
   <img src="docs/mllm.jpg" alt="MLLM交流学习群" style="zoom:20%;" />
-  <img src="docs/zsxq.JPG" alt="知识星球" style="zoom:20%;" />
+  <img src="docs/zsxq.jpg" alt="知识星球" style="zoom:20%;" />
 </div>
 

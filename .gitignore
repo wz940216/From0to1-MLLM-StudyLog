@@ -16,6 +16,7 @@ week05_blip_blip2_caption/outputs
 week06_clip_blip_web_demo/image_index.pt
 week08_minillava_training_v1/outputs
 week10_multitask_data/outputs
+week11_multiturn_dialogue/outputs
 
 
 dataset/alpaca-chinese-dataset

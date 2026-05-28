@@ -188,15 +188,15 @@ LoRA 的目标是：
 以某一层线性变换为例：
 
 原来是：
-$$
+$$  
 h = W x
-$$
+$$  
 
 LoRA 把参数更新写成一个低秩分解：
 
-$$
+$$  
 W' = W + \Delta W,\quad \Delta W = B A
-$$
+$$  
 
 - $W \in \mathbb{R}^{d_{\text{out}} \times d_{\text{in}}}$：原始权重（冻结）
 - $A \in \mathbb{R}^{r \times d_{\text{in}}}$

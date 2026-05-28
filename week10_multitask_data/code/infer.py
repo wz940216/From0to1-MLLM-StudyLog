@@ -10,7 +10,7 @@ from mini_llava import MiniLlavaModel
 def main():
     parser = argparse.ArgumentParser(description="MiniLLaVA推理脚本")
     parser.add_argument("--config", default="week10_multitask_data/code/config.yaml")
-    parser.add_argument("--checkpoint", default="week10_multitask_data/outputs/checkpoints/step_1125.pt", help="训练得到的 .pt 检查点路径")
+    parser.add_argument("--checkpoint", default="week10_multitask_data/outputs/checkpoints/step_236895.pt", help="训练得到的 .pt 检查点路径")
     parser.add_argument("--image", default="dataset/coco128/images/train2017/000000000025.jpg", help="输入图片路径")
     parser.add_argument("--question", default="Please describe this image", help="关于图片的问题")
     args = parser.parse_args()

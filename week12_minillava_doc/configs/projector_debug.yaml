@@ -1,0 +1,65 @@
+# 小样本调试：冻结视觉编码器和 LLM，只训练 projector/LoRA。
+DEVICE: "cuda"
+MINILLAVA:
+  VISION_ENCODER:
+    MODEL_PATH: "models/clip-vit-base-patch16"
+    FREEZE: true
+    OUTPUT_DIM: 768
+  LLM_DECODER:
+    MODEL_PATH: "models/Qwen1.5-1.8B"
+    FREEZE: true
+    LORA_R: 8
+    LORA_ALPHA: 32
+    LORA_DROPOUT: 0.1
+    MAX_NEW_TOKENS: 256
+    TEMPERATURE: 0.7
+    DO_SAMPLE: true
+  PROJECTOR:
+    INPUT_DIM: 768
+    HIDDEN_DIM: 1024
+DATA:
+  TRAIN_DATASET:
+    TASK_NAME: "COCOCaption"
+    PATH: "dataset/COCOCaption"
+    IMAGE_DIR: "val2017"
+    ANNOTATION_FILE: "annotations/captions_val2017_multiturn.json"
+    TRAIN_SPLIT: 0.9
+    MAX_LENGTH: 384
+    BATCH_SIZE: 2
+    NUM_WORKERS: 2
+  PREPROCESS:
+    IMAGE_SIZE: 224
+    MAX_TEXT_LENGTH: 384
+TRAINING:
+  OPTIMIZER:
+    TYPE: "adamw"
+    LR: 1e-4
+    WEIGHT_DECAY: 0.01
+    BETAS: [0.9, 0.999]
+  SCHEDULER:
+    TYPE: "constant"
+    WARMUP_STEPS: 0
+    NUM_EPOCHS: 1
+  GRAD_CLIP:
+    MAX_NORM: 1.0
+  CHECKPOINT:
+    SAVE_DIR: "week12_minillava_doc/outputs/checkpoints/projector_debug"
+    SAVE_STEPS: 100
+    SAVE_TOTAL_LIMIT: 2
+  LOGGING:
+    LOG_DIR: "week12_minillava_doc/outputs/logs/projector_debug"
+    LOG_STEPS: 5
+INFERENCE:
+  LOG_FILE: "week12_minillava_doc/outputs/logs/projector_debug/infer.jsonl"
+  GENERATION:
+    MAX_NEW_TOKENS: 256
+    TEMPERATURE: 0.7
+    DO_SAMPLE: true
+    TOP_P: 0.9
+    TOP_K: 50
+    REPETITION_PENALTY: 1.1
+  BATCH_SIZE: 1
+MISC:
+  SEED: 42
+  DEBUG: true
+  RESUME_FROM: null

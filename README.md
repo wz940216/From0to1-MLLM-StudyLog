@@ -307,14 +307,15 @@ pip install -r requirements.txt
 
 欢迎加入微信群一起学习、一起成长。
 
-也可以加入我的知识星球。这个星球会围绕「CV 到多模态实战 24 周」持续更新，我会把学习路线、代码实践、踩坑记录、模型训练细节和阶段性总结整理成更系统、更完整的笔记。如果你希望有人一起推进学习进度，交流实现细节，或者想参考一套持续更新的实战路线，也欢迎加入，一起把这 24 周认真走完。
-
-相比零散的文章，知识星球里的内容会更偏向体系化沉淀：每一周都会尽量围绕一个明确主题展开，从基础概念、论文/源码理解，到可运行的工程实践，再到实验复盘，帮助大家把 CV、多模态、MiniLLaVA 这类项目真正串起来。后续星球中也会持续更新更多多模态落地实战内容，包括真实项目案例拆解、多模态大模型训练与微调实践、以及从 Demo 到可用产品过程中会遇到的工程问题。
+也可以加入我的知识星球。这个星球会围绕「CV 到多模态实战 24 周」持续更新，学习路线、代码实践、踩坑记录、模型训练细节和阶段性总结更系统、更完整。
 
 ---
 
-<div style="text-align: center;">
-  <img src="docs/mllm.jpg" alt="MLLM交流学习群" style="zoom:20%;" />
-  <img src="docs/zsxq.jpg" alt="知识星球" style="zoom:20%;" />
+<div align="center">
+  <img src="docs/mllm.jpg" alt="MLLM交流学习群" width="180" />
+  <img src="docs/zsxq.jpg" alt="知识星球" width="180" />
 </div>
+
+## Stargazers over time
+[![Stargazers over time](https://starchart.cc/wz940216/From0to1-MLLM-StudyLog.svg?variant=adaptive)](https://github.com/wz940216/From0to1-MLLM-StudyLog)
 

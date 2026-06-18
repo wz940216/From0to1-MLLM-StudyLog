@@ -316,6 +316,12 @@ pip install -r requirements.txt
   <img src="docs/zsxq.jpg" alt="知识星球" width="180" />
 </div>
 
-## Stargazers over time
-[![Stargazers over time](https://starchart.cc/wz940216/From0to1-MLLM-StudyLog.svg?variant=adaptive)](https://github.com/wz940216/From0to1-MLLM-StudyLog)
 
+## Star History
+<a href="https://www.star-history.com/?repos=wz940216%2FFrom0to1-MLLM-StudyLog&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=wz940216/From0to1-MLLM-StudyLog&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=wz940216/From0to1-MLLM-StudyLog&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=wz940216/From0to1-MLLM-StudyLog&type=date&legend=top-left" />
+ </picture>
+</a>

@@ -18,6 +18,7 @@ week08_minillava_training_v1/outputs
 week10_multitask_data/outputs
 week11_multiturn_dialogue/outputs
 week13_chat_format_alignment/outputs/checkpoints/multitask_balanced/step_7761.pt
+week14_dialogue_stability_output_control/outputs
 
 dataset/alpaca-chinese-dataset
 dataset/cifar-10-batches-py

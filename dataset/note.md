@@ -6,7 +6,10 @@
 # dataset/LLaVA-CC3M-Pretrain-595K 下载
 hf download liuhaotian/LLaVA-CC3M-Pretrain-595K --repo-type=dataset --local-dir dataset/LLaVA-CC3M-Pretrain-595K
 
-# vqa数据集下载地址
+# vqa 数据集下载地址
 https://visualqa.org/download.html
+
+# dpo 数据集 MMInstruction/VLFeedback
+hf download MMInstruction/VLFeedback --repo-type=dataset --local-dir dataset/VLFeedback
 
 ```

@@ -1,0 +1,89 @@
+# 多任务训练：COCO caption + VQA，适合验证混合采样流程。
+DEVICE: "cuda"
+MINILLAVA:
+  VISION_ENCODER:
+    MODEL_PATH: "models/clip-vit-base-patch16"
+    FREEZE: true
+    OUTPUT_DIM: 768
+  LLM_DECODER:
+    MODEL_PATH: "models/Qwen1.5-1.8B"
+    FREEZE: true
+    LORA_R: 16
+    LORA_ALPHA: 32
+    LORA_DROPOUT: 0.05
+    MAX_NEW_TOKENS: 1024
+    TEMPERATURE: 0.7
+    DO_SAMPLE: true
+  PROJECTOR:
+    INPUT_DIM: 768
+    HIDDEN_DIM: 2048
+DATA:
+  TRAIN_DATASET:
+    TASK_NAME:
+      - "COCOCaption"
+      - "VQA"
+    PATH:
+      - "dataset/COCOCaption"
+      - "dataset/VQA"
+    IMAGE_DIR:
+      - "val2017"
+      - "scene_img_abstract_v002_val2017"
+    ANNOTATION_FILE:
+      - "annotations/captions_val2017_multiturn_system.json"
+      - "abstract_v002_val2017_multiturn_system.json"
+    SAMPLE_RATE:
+      - 0.5
+      - 0.5
+    TRAIN_SPLIT: 0.9
+    MAX_LENGTH: 1024
+    MAX_TURNS: 3
+    BATCH_SIZE: 1
+    NUM_WORKERS: 4
+  PREPROCESS:
+    IMAGE_SIZE: 224
+    MAX_TEXT_LENGTH: 1024
+TRAINING:
+  OPTIMIZER:
+    TYPE: "adamw"
+    LR: 8e-5
+    WEIGHT_DECAY: 0.01
+    BETAS: [0.9, 0.999]
+  SCHEDULER:
+    TYPE: "cosine"
+    WARMUP_STEPS: 100
+    NUM_EPOCHS: 3
+  GRAD_CLIP:
+    MAX_NORM: 1.0
+  CHECKPOINT:
+    SAVE_DIR: "week14_dialogue_stability_output_control/outputs/checkpoints/multitask_balanced"
+    SAVE_STEPS: 500
+    SAVE_TOTAL_LIMIT: 3
+  LOGGING:
+    LOG_DIR: "week14_dialogue_stability_output_control/outputs/logs/multitask_balanced"
+    LOG_STEPS: 10
+INFERENCE:
+  LOG_FILE: "week14_dialogue_stability_output_control/outputs/logs/multitask_balanced/infer.jsonl"
+  GENERATION:
+    MAX_NEW_TOKENS: 1024
+    TEMPERATURE: 0.7
+    DO_SAMPLE: true
+    TOP_P: 0.9
+    TOP_K: 50
+    REPETITION_PENALTY: 1.1
+  BATCH_SIZE: 1
+MISC:
+  SEED: 42
+  DEBUG: false
+  RESUME_FROM: null
+
+# DPO 偏好优化配置
+DPO:
+  TRAIN_FILE: "dataset/VLFeedback"  # DPO 数据来源：本地 VLFeedback、Hub 名称或普通 JSON/JSONL
+  IMAGE_ROOT: null  # 普通 JSON/JSONL 中 image 为相对路径时使用；VLFeedback 通常不需要
+  CHECKPOINT: "week14_dialogue_stability_output_control/outputs/checkpoints/multitask_balanced/step_15522.pt"  # 可选：SFT checkpoint 路径，policy/reference 都从这里初始化
+  SAVE_EXAMPLE_DATA: null  # 可选：只导出 DPO 示例 JSONL 后退出
+  EXAMPLE_IMAGE: null  # 生成示例数据或 toy data 时使用的图片
+  MAX_SAMPLES: null  # 调试时只取前 N 条偏好样本
+  BETA: 0.1  # DPO beta，越大表示偏好约束越强
+  TOY_DATA: false  # true 时不加载 VLFeedback，只使用内置两条小样本
+

@@ -19,6 +19,7 @@ week10_multitask_data/outputs
 week11_multiturn_dialogue/outputs
 week13_chat_format_alignment/outputs/checkpoints/multitask_balanced/step_7761.pt
 week14_dialogue_stability_output_control/outputs
+week16_multitask_tuning_summary/outputs
 
 dataset/alpaca-chinese-dataset
 dataset/cifar-10-batches-py
@@ -28,9 +29,10 @@ dataset/stanford_alpaca
 dataset/LLaVA-CC3M-Pretrain-595K
 dataset/VQA
 dataset/VLFeedback
+dataset/LLaVA-Instruct-150K
+dataset/coco2017
 
 
-AGENT.md
 
 # Optional common ignores
 *.pyc

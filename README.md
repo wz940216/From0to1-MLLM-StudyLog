@@ -317,11 +317,13 @@ pip install -r requirements.txt
 </div>
 
 
+
 ## Star History
-<a href="https://www.star-history.com/?repos=wz940216%2FFrom0to1-MLLM-StudyLog&type=date&legend=top-left">
+
+<a href="https://www.star-history.com/?repos=From0to1-MLLM-StudyLog%2FFrom0to1-MLLM-StudyLog&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=wz940216/From0to1-MLLM-StudyLog&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=wz940216/From0to1-MLLM-StudyLog&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=wz940216/From0to1-MLLM-StudyLog&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=From0to1-MLLM-StudyLog/From0to1-MLLM-StudyLog&type=date&theme=dark&legend=top-left&sealed_token=zzrxlUZ6uftC3mvdjG2KrpdmG5qsQjRRdGBZxTHUF2o8X0H7D6X9xEtLG5hTBROcH4uFYuYXXgI4KoojaWzx7H0lcUNJSPufrG9JtT0jnUvXfTeqJbUvrOTX2-ZU16pPvhZ6DgDitx1iOHKmgNBzAk4rhEiZpGulI5iT9PkdSMX6xMfwRDNlPkuM3bBz" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=From0to1-MLLM-StudyLog/From0to1-MLLM-StudyLog&type=date&legend=top-left&sealed_token=zzrxlUZ6uftC3mvdjG2KrpdmG5qsQjRRdGBZxTHUF2o8X0H7D6X9xEtLG5hTBROcH4uFYuYXXgI4KoojaWzx7H0lcUNJSPufrG9JtT0jnUvXfTeqJbUvrOTX2-ZU16pPvhZ6DgDitx1iOHKmgNBzAk4rhEiZpGulI5iT9PkdSMX6xMfwRDNlPkuM3bBz" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=From0to1-MLLM-StudyLog/From0to1-MLLM-StudyLog&type=date&legend=top-left&sealed_token=zzrxlUZ6uftC3mvdjG2KrpdmG5qsQjRRdGBZxTHUF2o8X0H7D6X9xEtLG5hTBROcH4uFYuYXXgI4KoojaWzx7H0lcUNJSPufrG9JtT0jnUvXfTeqJbUvrOTX2-ZU16pPvhZ6DgDitx1iOHKmgNBzAk4rhEiZpGulI5iT9PkdSMX6xMfwRDNlPkuM3bBz" />
  </picture>
 </a>

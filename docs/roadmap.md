@@ -214,14 +214,14 @@
 
 ---
 
-## 第 17–20 周：推理加速 & 部署
+## 第 17–20 周：模型封装、推理服务 & 部署
 
 ### 第 17 周：LLM 推理优化 & vLLM
 
 | 天   | 学习内容                                             | 目标                      | 参考文档/论文                                 |
 | ---- | ---------------------------------------------------- | ------------------------- | --------------------------------------------- |
 | 周一 | 安装 vLLM，阅读基本用法                              | 掌握 vLLM 部署 LLM 的方法 | vLLM 文档<br>https://vllm.readthedocs.io/     |
-| 周二 | 用 vLLM 部署 Qwen1.5-7B / Llama-3-8B 模型            | 跑通 vLLM 服务            | vLLM Quickstart 示例                          |
+| 周二 | 用 vLLM 部署 Qwen1.5-1.8B-Chat 模型            | 跑通 vLLM 服务            | vLLM Quickstart 示例                          |
 | 周三 | 对比 Transformers 原生推理 vs vLLM（单请求、多并发） | 初步感知性能差异          | —                                             |
 | 周四 | 学习 KV cache、prefill/decoding 的概念               | 理解推理优化点            | vLLM 论文<br>https://arxiv.org/abs/2309.16463 |
 | 周五 | 写一个压测脚本（多并发请求测 QPS/latency）           | 实现基本性能测试          | —                                             |
@@ -229,16 +229,16 @@
 
 ---
 
-### 第 18 周：Vision Encoder TensorRT / OpenVINO
+### 第 18 周：mini-LLaVA HF 化 & vLLM 部署
 
-| 天   | 学习内容                                                 | 目标                         | 参考文档/论文                                                |
-| ---- | -------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------ |
-| 周一 | 安装 TensorRT & ONNX Runtime；            | 搭建推理加速环境             | TensorRT 文档<br>https://docs.nvidia.com/deeplearning/tensorrt/ |
-| 周二 | 将 CLIP-ViT-B/16 导出 ONNX，并在 ONNX Runtime 中推理验证 | 具备 ONNX 导出和验证能力     | —                                                            |
-| 周三 | 从 ONNX 转 TensorRT，引擎 FP16 推理，比较速度            | 完成 TRT 加速 Vision Encoder | —                                                            |
-| 周四 | （可选）尝试导入 OpenVINO 并在 CPU 上测试                | 掌握另一种部署路径           | OpenVINO 文档<br>https://docs.openvino.ai/                   |
-| 周五 | 在 mini-LLaVA 推理脚本中替换 Vision 部分为 TRT/OV 推理   | 打通多模态模型 + 加速 Vision | —                                                            |
-| 周六 | 记录 PyTorch vs TRT/OV 的延时对比                        | 量化加速收益                 | —                                                            |
+| 天   | 学习内容                                                               | 目标                                      | 参考文档/论文                                                |
+| ---- | ---------------------------------------------------------------------- | ----------------------------------------- | ------------------------------------------------------------ |
+| 周一 | 梳理 mini-LLaVA 现有模型结构、配置、processor 和推理入口               | 明确需要改造成 HF 风格的模块边界          | Transformers 自定义模型文档<br>https://huggingface.co/docs/transformers/custom_models |
+| 周二 | 实现 `MiniLlavaConfig`、`MiniLlavaModel` / `MiniLlavaForConditionalGeneration` | 支持 `save_pretrained` / `from_pretrained` | Transformers PreTrainedModel 文档                            |
+| 周三 | 实现图像 processor、tokenizer 包装和 chat template                      | 对齐 HF 多模态模型的输入格式              | LLaVA HF 文档<br>https://huggingface.co/docs/transformers/main/en/model_doc/llava |
+| 周四 | 接入 `AutoConfig`、`AutoModel`、`AutoProcessor` 并整理模型目录结构      | 让 mini-LLaVA 可以像 HF 模型一样加载      | —                                                            |
+| 周五 | 用 vLLM 加载 HF 化后的 mini-LLaVA，跑通本地图文对话服务                | 完成 vLLM 多模态部署验证                  | vLLM 多模态文档<br>https://docs.vllm.ai/                     |
+| 周六 | 编写兼容性测试、部署说明和简单并发压测                                 | 形成可复用的 HF + vLLM 部署模板           | —                                                            |
 
 ---
 
@@ -247,7 +247,7 @@
 | 天   | 学习内容                                                   | 目标                   | 参考文档/论文                                 |
 | ---- | ---------------------------------------------------------- | ---------------------- | --------------------------------------------- |
 | 周一 | 使用 FastAPI 搭建基础 HTTP 服务框架                        | 搭建 API 骨架          | FastAPI 文档<br>https://fastapi.tiangolo.com/ |
-| 周二 | 集成 Vision TRT/OV + LLM（vLLM 或 Transformers）到 FastAPI | 完成端到端 pipeline    | —                                             |
+| 周二 | 集成图片预处理、prompt 构造和 vLLM 推理到 FastAPI          | 完成端到端 pipeline    | —                                             |
 | 周三 | 增加请求队列、简单限流逻辑                                 | 提升服务稳定性         | —                                             |
 | 周四 | 增加日志记录（每个请求的分阶段耗时）                       | 方便性能分析           | —                                             |
 | 周五 | 编写客户端脚本（或前端）调用 `/chat` 接口                  | 实现可用多模态聊天服务 | —                                             |
@@ -276,7 +276,7 @@
 | ---- | ----------------------------------------------------------- | ------------------ | ----------------------------------------------------------- |
 | 周一 | 确定项目方向：文档/图表/UI 多模态问答 | 明确项目主题       | —                                                           |
 | 周二 | 画系统架构图：上传 -> 解析 -> OCR -> 多模态模型 -> 回答     | 明确组件划分       | —                                                           |
-| 周三 | 选定 OCR 模块（可用 PaddleOCR / 你已有模型）并调试          | 打通 OCR 能力      | PaddleOCR 文档<br>https://github.com/PaddlePaddle/PaddleOCR |
+| 周三 | 选定 OCR 模块（可用 PaddleOCR）并调试          | 打通 OCR 能力      | PaddleOCR 文档<br>https://github.com/PaddlePaddle/PaddleOCR |
 | 周四 | 设计数据流：图片 + OCR 文本如何喂给多模态模型               | 设计多模态输入格式 | —                                                           |
 | 周五 | 规划前端 UI：上传文档/图片、展示答案                        | 设计用户交互       | —                                                           |
 | 周六 | 写项目计划文档：目标、里程碑、评价指标                      | 形成整体路线图     | —                                                           |
@@ -300,7 +300,7 @@
 
 | 天   | 学习内容                                         | 目标           | 参考文档/论文 |
 | ---- | ------------------------------------------------ | -------------- | ------------- |
-| 周一 | 引入 Vision TRT/OV 加速，优化多页文档整体耗时    | 提升性能       | —             |
+| 周一 | 基于 HF 化 mini-LLaVA + vLLM 优化多页文档问答整体耗时 | 提升性能       | —             |
 | 周二 | 针对常见场景做 Prompt 优化（例如表格、标题识别） | 提升回答准确率 | —             |
 | 周三 | 增加简单缓存（如对相同文档 hash 缓存中间结果）   | 减少重复计算   | —             |
 | 周四 | 检查日志与错误处理，完善异常返回                 | 提升鲁棒性     | —             |

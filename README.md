@@ -9,7 +9,7 @@
 - CLIP / BLIP / BLIP-2 / LLaVA 等代表性多模态架构理解与复现
 - 自建 mini-LLaVA（mini 多模态模型）的训练、重构与多任务扩展
 - 指令对齐、安全策略与多轮对话等工程问题
-- 推理加速（vLLM / TensorRT / OpenVINO）与服务部署
+- HF Transformers 兼容封装、vLLM 多模态推理与服务部署
 - 最终落地一个代表性多模态应用（如文档多模态问答系统）
 
 仓库定位为「个人自学 + 实战工程笔记」，不是正式课程，但力求做到：
@@ -48,7 +48,7 @@
 ├── week15_safety_alignment/
 ├── week16_multitask_tuning_summary/
 ├── week17_llm_inference_vllm/
-├── week18_vision_tensorrt_openvino/
+├── week18_minillava_hf_vllm/
 ├── week19_end2end_service/
 ├── week20_benchmark_optimization/
 ├── week21_project_design/
@@ -189,7 +189,7 @@
 
 ---
 
-### 第 17–20 周：推理加速 & 部署
+### 第 17–20 周：模型封装、推理服务 & 部署
 
 #### 第 17 周：LLM 推理优化 & vLLM
 
@@ -197,15 +197,15 @@
 - 对比 Transformers 原生推理与 vLLM 的性能（单请求、多并发）
 - 理解 KV cache、prefill/decoding 等关键概念，写压测脚本并记录结果
 
-#### 第 18 周：Vision Encoder TensorRT / OpenVINO
+#### 第 18 周：mini-LLaVA HF 化 & vLLM 部署
 
-- 将 CLIP-ViT-B/16 导出为 ONNX，使用 ONNX Runtime 验证
-- 转 TensorRT（FP16），测量加速效果，可选尝试 OpenVINO（CPU）
-- 在 mini-LLaVA 推理脚本中替换 Vision 模块为 TRT/OV 推理
+- 将 mini-LLaVA 改造成 Hugging Face Transformers 风格：`config`、`modeling`、`processing`、`chat_template`
+- 对齐 HF `save_pretrained` / `from_pretrained` / `AutoModel` / `AutoProcessor` 的加载方式
+- 使用 vLLM 部署 HF 化后的 mini-LLaVA，验证图文对话接口和并发推理
 
 #### 第 19 周：端到端多模态服务化
 
-- 使用 FastAPI 搭建 HTTP 服务，把 Vision Encoder + LLM 串成完整 pipeline
+- 使用 FastAPI 搭建 HTTP 服务，把图片预处理、prompt 构造和 vLLM 推理串成完整 pipeline
 - 加入请求队列、简单限流和分阶段耗时日志
 - 提供客户端脚本 / UI，实现可用多模态聊天/问答服务
 
@@ -233,7 +233,7 @@
 
 #### 第 23 周：优化 & 工程加固
 
-- 引入 Vision 加速（TensorRT/OV），优化多页文档整体耗时
+- 基于 HF 化 mini-LLaVA + vLLM 优化多页文档问答整体耗时
 - 针对常见场景（表格、标题等）做 Prompt 与逻辑优化
 - 增加缓存、完善日志与错误处理，对系统做一轮压测
 
@@ -274,7 +274,7 @@
   - `transformers`, `datasets`, `accelerate`, `peft`, `bitsandbytes`
   - `torchvision`, `opencv-python`, `Pillow`
   - `gradio` 或 `fastapi`, `uvicorn`
-  - `vllm`, `onnx`, `onnxruntime`, `tensorrt`（可选）
+  - `vllm`, `tokenizers`, `safetensors`
   - `pymupdf` / `pdf2image`, `paddleocr` 等（用于文档项目）
 
 示例安装：
@@ -295,7 +295,7 @@ pip install -r requirements.txt
 - `docs/refs.md`：包括但不限于
   - LLaVA, MiniGPT-4, BLIP, BLIP-2, CLIP, Qwen/Qwen-VL 等模型
   - Hugging Face Transformers / PEFT / Datasets / TRL 文档
-  - vLLM, TensorRT, OpenVINO 等部署与加速框架
+  - Hugging Face Transformers 与 vLLM 等部署框架
   - 各类综述与教程文章
 
 感谢这些开源工作为本仓库提供了丰富的实践素材与灵感。

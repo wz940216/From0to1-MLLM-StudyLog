@@ -198,7 +198,7 @@ trainer.train()
 
 # ----------------------------模型保存----------------------------
 # 15) 保存 LoRA 参数和模型
-model.save_pretrained("week2/Qwen1.5-1.8B-Chat-lora/model")
+model.save_pretrained("week02_sft_lora_qlora/Qwen1.5-1.8B-Chat-lora/model")
 
 
 

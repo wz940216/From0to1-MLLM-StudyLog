@@ -3,9 +3,9 @@ import torch
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
-    DataCollatorForLanguageModeling,
     TrainingArguments,
     Trainer,
+    default_data_collator,
 )
 from peft import LoraConfig, TaskType, get_peft_model
 from datasets import load_dataset
@@ -61,6 +61,11 @@ zh_val_dataset = val_dataset.map(convert_to_zh_format, remove_columns=val_datase
 #    trust_remote_code=True 是为了支持 Qwen 模型自定义 tokenizer class
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, trust_remote_code=True)
 
+# padding 会在 tokenize_fn 中用于构造 labels，需要在 map 数据集前设置好。
+if tokenizer.pad_token is None:
+    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.pad_token_id = tokenizer.eos_token_id
+
 
 def make_prompt(example):
     """构建因果语言建模 prompt: 指令 +（可选输入） + 回复"""
@@ -88,6 +93,10 @@ def tokenize_fn(example):
     prompt_len = len(tokenizer(prompt, truncation=True, max_length=1024)["input_ids"])
     labels = tokenized["input_ids"].copy()
     labels[:prompt_len] = [-100] * prompt_len
+    labels = [
+        -100 if token_id == tokenizer.pad_token_id else token_id
+        for token_id in labels
+    ]
     tokenized["labels"] = labels
     return tokenized
 
@@ -98,8 +107,8 @@ zh_train_dataset = zh_train_dataset.map(tokenize_fn, remove_columns=zh_train_dat
 zh_val_dataset = zh_val_dataset.map(tokenize_fn, remove_columns=zh_val_dataset.column_names)
 
 
-# 7) Data Collator: 因果语言模型不需要 MLM
-data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
+# 7) Data Collator: 保留 tokenize_fn 中手动构造的 labels
+data_collator = default_data_collator
 
 
 # ----------------------------评价指标----------------------------
@@ -130,7 +139,7 @@ peft_config = LoraConfig(
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_NAME,
     dtype=torch.bfloat16,
-    device_map="auto",
+    device_map="cpu",
 )
 
 # 关闭 cache，避免训练时梯度计算和 memory 问题
@@ -140,10 +149,7 @@ model.config.use_cache = False
 model = get_peft_model(model, peft_config)
 
 
-# 12) 对齐 token id：Qwen 有些版本没有 pad_token，需要显式设置
-tokenizer.pad_token = tokenizer.eos_token
-tokenizer.pad_token_id = tokenizer.eos_token_id
-
+# 12) 对齐 token id
 if tokenizer.bos_token_id is None:
     tokenizer.bos_token = tokenizer.convert_ids_to_tokens(model.config.bos_token_id)
     tokenizer.bos_token_id = model.config.bos_token_id

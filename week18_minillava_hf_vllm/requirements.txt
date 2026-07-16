@@ -1,0 +1,8 @@
+transformers>=4.45.0
+torch
+Pillow
+PyYAML
+safetensors
+accelerate
+peft
+vllm

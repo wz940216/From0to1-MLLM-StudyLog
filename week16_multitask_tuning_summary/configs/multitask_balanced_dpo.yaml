@@ -64,7 +64,7 @@ TRAINING:
   GRAD_CLIP:
     MAX_NORM: 1.0
   CHECKPOINT:
-    LOAD_PATH: null
+    LOAD_PATH: week16_multitask_tuning_summary/outputs/checkpoints/multitask_balanced/sft/best.pt
     SAVE_DIR: "week16_multitask_tuning_summary/outputs/checkpoints/multitask_balanced"
     SAVE_STEPS: 500
     SAVE_TOTAL_LIMIT: 3

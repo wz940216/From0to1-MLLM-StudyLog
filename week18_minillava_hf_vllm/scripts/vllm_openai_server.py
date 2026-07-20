@@ -1,10 +1,4 @@
-"""
-Start an OpenAI-compatible vLLM server for the exported MiniLLaVA directory.
-
-vLLM must support this custom architecture before this can run end to end. The
-script keeps the launch command reproducible for week18; if your vLLM version
-does not recognize `minillava`, use the Transformers inference script first.
-"""
+"""Start an OpenAI-compatible vLLM server for the exported MiniLLaVA directory."""
 
 import argparse
 import subprocess
@@ -22,21 +16,27 @@ def parse_args():
     parser.add_argument("--served-model-name", default="minillava")
     parser.add_argument("--host", default="0.0.0.0")
     parser.add_argument("--port", type=int, default=8000)
-    parser.add_argument("--dtype", default="auto")
+    parser.add_argument("--dtype", default="float16")
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.85)
+    parser.add_argument("--model-impl", default="transformers", choices=["auto", "vllm", "transformers"])
+    parser.add_argument("--max-model-len", type=int, default=1024)
+    parser.add_argument("--enforce-eager", action="store_true", default=True)
+    parser.add_argument("--allowed-local-media-path", default=str(ROOT))
+    parser.add_argument("--chat-template-content-format", default="openai", choices=["auto", "string", "openai"])
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
+    model_path = str(Path(args.model_path).resolve())
     command = [
         sys.executable,
         "-m",
         "vllm.entrypoints.openai.api_server",
         "--model",
-        args.model_path,
+        model_path,
         "--tokenizer",
-        args.model_path,
+        model_path,
         "--served-model-name",
         args.served_model_name,
         "--host",
@@ -48,7 +48,17 @@ def main():
         "--trust-remote-code",
         "--gpu-memory-utilization",
         str(args.gpu_memory_utilization),
+        "--model-impl",
+        args.model_impl,
+        "--max-model-len",
+        str(args.max_model_len),
+        "--allowed-local-media-path",
+        args.allowed_local_media_path,
+        "--chat-template-content-format",
+        args.chat_template_content_format,
     ]
+    if args.enforce_eager:
+        command.append("--enforce-eager")
     print(" ".join(command))
     subprocess.run(command, check=True)
 

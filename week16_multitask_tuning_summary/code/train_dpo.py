@@ -251,9 +251,34 @@ class LlavaDPOCollator:
 def load_checkpoint(model, checkpoint_path):
     """加载 SFT checkpoint，DPO 通常从 SFT 模型继续训练。"""
     if checkpoint_path is None:
-        return
+        return None
     state = torch.load(checkpoint_path, map_location=model.device)
-    model.load_state_dict(state["model"], strict=False)
+    state_dict = state.get("model", state)
+    model_state = model.state_dict()
+
+    loadable_state = {}
+    skipped_shape = []
+    for name, value in state_dict.items():
+        if name not in model_state:
+            loadable_state[name] = value
+            continue
+        if tuple(value.shape) != tuple(model_state[name].shape):
+            skipped_shape.append({
+                "name": name,
+                "checkpoint_shape": tuple(value.shape),
+                "model_shape": tuple(model_state[name].shape),
+            })
+            continue
+        loadable_state[name] = value
+
+    incompatible = model.load_state_dict(loadable_state, strict=False)
+    return {
+        "path": checkpoint_path,
+        "loaded_keys": list(loadable_state.keys()),
+        "missing_keys": incompatible.missing_keys,
+        "unexpected_keys": incompatible.unexpected_keys,
+        "skipped_shape": skipped_shape,
+    }
 
 
 def freeze_model(model):
@@ -368,6 +393,10 @@ def parse_args_and_config():
 def main():
     args, config = parse_args_and_config()
 
+    # 当前环境中 cuDNN Conv2d 会触发 CUDNN_STATUS_NOT_INITIALIZED；CLIP patch embedding
+    # 是 Conv2d，禁用 cuDNN 后仍走 CUDA 计算，能避开该后端初始化问题。
+    torch.backends.cudnn.enabled = False
+
     if args.save_example_data:
         save_example_dataset(args.save_example_data, example_image=args.example_image)
         print(f"已保存 MiniLLaVA DPO 示例数据: {args.save_example_data}")
@@ -379,8 +408,8 @@ def main():
 
     policy_model = MiniLlavaModel(args.config)
     ref_model = MiniLlavaModel(args.config)
-    load_checkpoint(policy_model, args.checkpoint)
-    load_checkpoint(ref_model, args.checkpoint)
+    policy_load_info = load_checkpoint(policy_model, args.checkpoint)
+    ref_load_info = load_checkpoint(ref_model, args.checkpoint)
     freeze_model(ref_model)
     policy_model.train()
 
@@ -423,10 +452,25 @@ def main():
     log_dir = config["TRAINING"]["LOGGING"].get("LOG_DIR", "week15_safety_alignment/outputs/logs")
     train_log_path = os.path.join(log_dir, "train_dpo.jsonl")
     save_steps = int(config["TRAINING"]["CHECKPOINT"]["SAVE_STEPS"])
-    save_dir = os.path.join(config["TRAINING"]["CHECKPOINT"]["SAVE_DIR"], "dpo")
+    save_dir = config["TRAINING"]["CHECKPOINT"]["SAVE_DIR"]
     max_norm = float(config["TRAINING"]["GRAD_CLIP"]["MAX_NORM"])
 
     if accelerator.is_main_process:
+        if policy_load_info is not None:
+            print(
+                f"policy 已加载检查点: {policy_load_info['path']} "
+                f"loaded={len(policy_load_info['loaded_keys'])} "
+                f"missing={len(policy_load_info['missing_keys'])} "
+                f"unexpected={len(policy_load_info['unexpected_keys'])} "
+                f"shape_skipped={len(policy_load_info['skipped_shape'])}"
+            )
+            for item in policy_load_info["skipped_shape"][:20]:
+                print(
+                    "跳过 shape 不一致参数: "
+                    f"{item['name']} checkpoint={item['checkpoint_shape']} model={item['model_shape']}"
+                )
+        if ref_load_info is not None and ref_load_info["skipped_shape"]:
+            print(f"reference 同样跳过了 {len(ref_load_info['skipped_shape'])} 个 shape 不一致参数。")
         print(f"启用 MiniLLaVA DPO 训练: n={len(dataset)}, beta={args.beta}")
         append_jsonl(train_log_path, {
             "event": "dpo_train_start",

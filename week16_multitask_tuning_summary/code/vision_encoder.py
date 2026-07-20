@@ -1,6 +1,6 @@
 from PIL import Image
 import torch
-from transformers import CLIPImageProcessor, CLIPVisionModel
+from transformers import AutoConfig, CLIPImageProcessor, CLIPModel, CLIPVisionModel
 
 
 def resolve_device(device):
@@ -25,7 +25,12 @@ class VisionEncoder(torch.nn.Module):
 
         # CLIPImageProcessor 负责 resize、center crop、normalize 等 CLIP 所需预处理。
         self.processor = CLIPImageProcessor.from_pretrained(model_path)
-        self.vision_model = CLIPVisionModel.from_pretrained(model_path).to(self.device)
+        model_config = AutoConfig.from_pretrained(model_path)
+        architectures = set(getattr(model_config, "architectures", []) or [])
+        if "CLIPModel" in architectures:
+            self.vision_model = CLIPModel.from_pretrained(model_path).vision_model.to(self.device)
+        else:
+            self.vision_model = CLIPVisionModel.from_pretrained(model_path).to(self.device)
 
         # 预训练视觉塔通常冻结，只训练 projector 和语言模型；小数据集上这样更稳定。
         if freeze:

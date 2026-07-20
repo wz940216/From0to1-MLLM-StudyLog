@@ -39,10 +39,24 @@ class MiniLlavaModel(torch.nn.Module):
         ).to(self.device)
 
     def _resolve_device(self, device):
-        """把配置中的设备字符串转成真实可用的 torch.device。"""
-        if device == "cuda" and not torch.cuda.is_available():
+        """把配置中的设备字符串转成真实可用的 torch.device。
+
+        accelerate 多进程启动时，每个进程都有自己的 LOCAL_RANK。这里不能只返回
+        cuda，否则模型在 accelerator.prepare() 之前会先被搬到 cuda:0，4 卡训练时
+        容易在同一张卡上初始化 cuDNN/显存。
+        """
+        device = str(device)
+        if device.startswith("cuda") and not torch.cuda.is_available():
             print("配置使用 cuda，但当前环境没有可用 GPU，自动切换到 cpu。")
             return torch.device("cpu")
+        if device == "cuda" and torch.cuda.is_available():
+            import os
+
+            local_rank = os.environ.get("LOCAL_RANK")
+            if local_rank is not None:
+                local_rank = int(local_rank)
+                torch.cuda.set_device(local_rank)
+                return torch.device(f"cuda:{local_rank}")
         return torch.device(device)
 
     def load_config(self, config_path):

@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from transformers import AutoModelForCausalLM, CLIPVisionModel, PreTrainedModel
+from transformers import AutoModel, AutoModelForCausalLM, CLIPVisionModel, PreTrainedModel
 from transformers.modeling_outputs import CausalLMOutputWithPast
 
 from .configuration_minillava import MiniLlavaConfig
@@ -44,10 +44,41 @@ class MiniLlavaForConditionalGeneration(MiniLlavaPreTrainedModel):
         super().__init__(config)
         self.vision_tower = CLIPVisionModel(config.vision_config)
         self.multi_modal_projector = MiniLlavaProjector(config)
-        self.language_model = AutoModelForCausalLM.from_config(
-            config.text_config,
-            trust_remote_code=True,
-        )
+        self.language_model_type = getattr(config, "language_model_type", "causal_lm")
+        if self.language_model_type == "backbone":
+            self.language_model = AutoModel.from_config(
+                config.text_config,
+                trust_remote_code=True,
+            )
+            self.lm_head = nn.Linear(
+                config.text_config.hidden_size,
+                config.text_config.vocab_size,
+                bias=False,
+            )
+        else:
+            self.language_model = AutoModelForCausalLM.from_config(
+                config.text_config,
+                trust_remote_code=True,
+            )
+
+    @property
+    def all_tied_weights_keys(self):
+        tied_keys = {}
+        for attr_name in ("all_tied_weights_keys", "_tied_weights_keys"):
+            keys = getattr(self.language_model, attr_name, None)
+            if isinstance(keys, dict):
+                keys = keys.keys()
+            for key in keys or []:
+                full_key = f"language_model.{key}"
+                tied_keys[full_key] = full_key
+        return tied_keys
+
+    @classmethod
+    def is_backend_compatible(cls):
+        return True
+
+    def get_image_features(self, pixel_values, **kwargs):
+        return list(self._encode_images(pixel_values).unbind(0))
 
     def get_input_embeddings(self):
         return self.language_model.get_input_embeddings()
@@ -56,25 +87,49 @@ class MiniLlavaForConditionalGeneration(MiniLlavaPreTrainedModel):
         self.language_model.set_input_embeddings(value)
 
     def get_output_embeddings(self):
+        if hasattr(self, "lm_head"):
+            return self.lm_head
         return self.language_model.get_output_embeddings()
 
     def set_output_embeddings(self, new_embeddings):
-        self.language_model.set_output_embeddings(new_embeddings)
+        if hasattr(self, "lm_head"):
+            self.lm_head = new_embeddings
+        else:
+            self.language_model.set_output_embeddings(new_embeddings)
 
     def resize_token_embeddings(self, new_num_tokens=None, pad_to_multiple_of=None, mean_resizing=True):
         try:
-            return self.language_model.resize_token_embeddings(
+            embeddings = self.language_model.resize_token_embeddings(
                 new_num_tokens=new_num_tokens,
                 pad_to_multiple_of=pad_to_multiple_of,
                 mean_resizing=mean_resizing,
             )
         except TypeError:
-            return self.language_model.resize_token_embeddings(
+            embeddings = self.language_model.resize_token_embeddings(
                 new_num_tokens=new_num_tokens,
                 pad_to_multiple_of=pad_to_multiple_of,
             )
+        if hasattr(self, "lm_head") and new_num_tokens is not None:
+            old_head = self.lm_head
+            new_head = nn.Linear(
+                old_head.in_features,
+                int(new_num_tokens),
+                bias=old_head.bias is not None,
+                device=old_head.weight.device,
+                dtype=old_head.weight.dtype,
+            )
+            rows = min(old_head.weight.size(0), new_head.weight.size(0))
+            new_head.weight.data[:rows] = old_head.weight.data[:rows]
+            if old_head.bias is not None:
+                new_head.bias.data[:rows] = old_head.bias.data[:rows]
+            self.lm_head = new_head
+            self.config.text_config.vocab_size = int(new_num_tokens)
+            self.config.vocab_size = int(new_num_tokens)
+        return embeddings
 
     def _encode_images(self, pixel_values):
+        vision_dtype = next(self.vision_tower.parameters()).dtype
+        pixel_values = pixel_values.to(dtype=vision_dtype)
         vision_outputs = self.vision_tower(pixel_values=pixel_values)
         patch_features = vision_outputs.last_hidden_state[:, 1:, :]
         return self.multi_modal_projector(patch_features)
@@ -174,6 +229,37 @@ class MiniLlavaForConditionalGeneration(MiniLlavaPreTrainedModel):
                 labels=labels,
             )
 
+        language_dtype = next(self.language_model.parameters()).dtype
+        inputs_embeds = inputs_embeds.to(dtype=language_dtype)
+        # vLLM's Transformers backend wraps this class and expects backbone hidden
+        # states, not LM logits. It passes attention_instances/return_dict=False.
+        if labels is None and ("attention_instances" in kwargs or kwargs.get("return_dict") is False):
+            base_model = getattr(self.language_model, "model", self.language_model)
+            outputs = base_model(
+                inputs_embeds=inputs_embeds,
+                attention_mask=attention_mask,
+                **kwargs,
+            )
+            if isinstance(outputs, tuple):
+                return outputs
+            return (outputs.last_hidden_state,)
+
+        if hasattr(self, "lm_head"):
+            outputs = self.language_model(
+                inputs_embeds=inputs_embeds,
+                attention_mask=attention_mask,
+                **kwargs,
+            )
+            hidden_states = outputs[0] if isinstance(outputs, tuple) else outputs.last_hidden_state
+            logits = self.lm_head(hidden_states)
+            return CausalLMOutputWithPast(
+                loss=None,
+                logits=logits,
+                past_key_values=getattr(outputs, "past_key_values", None),
+                hidden_states=getattr(outputs, "hidden_states", None),
+                attentions=getattr(outputs, "attentions", None),
+            )
+
         outputs = self.language_model(
             inputs_embeds=inputs_embeds,
             attention_mask=attention_mask,
@@ -200,6 +286,10 @@ class MiniLlavaForConditionalGeneration(MiniLlavaPreTrainedModel):
             input_ids=input_ids,
             attention_mask=attention_mask,
         )
+        language_dtype = next(self.language_model.parameters()).dtype
+        inputs_embeds = inputs_embeds.to(dtype=language_dtype)
+        if not hasattr(self.language_model, "generate"):
+            raise RuntimeError("generate is only available for causal_lm exports; use vLLM for backbone exports.")
         return self.language_model.generate(
             inputs_embeds=inputs_embeds,
             attention_mask=attention_mask,

@@ -15,6 +15,7 @@ class MiniLlavaConfig(PretrainedConfig):
         image_token="<image>",
         image_token_id=None,
         ignore_index=-100,
+        language_model_type="causal_lm",
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -43,6 +44,7 @@ class MiniLlavaConfig(PretrainedConfig):
         self.image_token = image_token
         self.image_token_id = image_token_id
         self.ignore_index = ignore_index
+        self.language_model_type = language_model_type
         self.vocab_size = getattr(self.text_config, "vocab_size", None)
         self.hidden_size = getattr(self.text_config, "hidden_size", None)
 
@@ -50,5 +52,6 @@ class MiniLlavaConfig(PretrainedConfig):
         output = super().to_dict()
         output["vision_config"] = self.vision_config.to_dict()
         output["text_config"] = self.text_config.to_dict()
+        output["language_model_type"] = self.language_model_type
         output["model_type"] = self.model_type
         return output

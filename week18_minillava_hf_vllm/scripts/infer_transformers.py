@@ -18,19 +18,7 @@ from minillava_hf import register_minillava_auto_classes
 
 
 def build_prompt(processor, question):
-    messages = [
-        {
-            "role": "user",
-            "content": [
-                {"type": "image"},
-                {"type": "text", "text": question},
-            ],
-        }
-    ]
-    if getattr(processor.tokenizer, "chat_template", None):
-        return processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
     return f"USER: {processor.image_token}\n{question}\nASSISTANT: "
-
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Run MiniLLaVA HF inference with Transformers.")
@@ -44,12 +32,13 @@ def parse_args():
 
 def main():
     args = parse_args()
+    torch.backends.cudnn.enabled = False
     register_minillava_auto_classes()
     processor = AutoProcessor.from_pretrained(args.model_path, trust_remote_code=True)
     model = AutoModelForCausalLM.from_pretrained(
         args.model_path,
         trust_remote_code=True,
-        torch_dtype=torch.float16 if args.device == "cuda" else torch.float32,
+        dtype=torch.float16 if args.device == "cuda" else torch.float32,
     ).to(args.device)
     model.eval()
 

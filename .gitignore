@@ -20,6 +20,7 @@ week11_multiturn_dialogue/outputs
 week13_chat_format_alignment/outputs/checkpoints/multitask_balanced/step_7761.pt
 week14_dialogue_stability_output_control/outputs
 week16_multitask_tuning_summary/outputs
+week18_minillava_hf_vllm/outputs/minillava-hf
 
 dataset/alpaca-chinese-dataset
 dataset/cifar-10-batches-py

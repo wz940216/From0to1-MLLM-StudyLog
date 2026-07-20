@@ -17,8 +17,8 @@ The model keeps the week16 behavior: one `<image>` token in the prompt is replac
 
 ```bash
 python week18_minillava_hf_vllm/scripts/convert_week16_to_hf.py \
-  --config week16_multitask_tuning_summary/configs/config.yaml \
-  --checkpoint path/to/week16/checkpoint.pt \
+  --config week16_multitask_tuning_summary/configs/multitask_balanced_sft.yaml \
+  --checkpoint week16_multitask_tuning_summary/outputs/checkpoints/multitask_balanced/sft/best.pt \
   --output-dir week18_minillava_hf_vllm/outputs/minillava-hf
 ```
 
@@ -35,10 +35,10 @@ The exporter saves:
 ## Transformers Inference
 
 ```bash
-python week18_minillava_hf_vllm/scripts/infer_transformers.py \
-  --model-path week18_minillava_hf_vllm/outputs/minillava-hf \
-  --image dataset/coco128/images/train2017/000000000009.jpg \
-  --question "请描述这张图片。"
+python week18_minillava_hf_vllm/scripts/infer_transformers.py   --model-path week18_minillava_hf_vllm/outputs/minillava-hf   --image dataset/coco128/images/train2017/000000000025.jpg   --question 
+"请描述这张图片。"
+
+A giraffe and a tree by the side of a trail.
 ```
 
 You can also load it through Auto classes after registering the local classes:
@@ -55,12 +55,15 @@ model = AutoModelForCausalLM.from_pretrained("week18_minillava_hf_vllm/outputs/m
 ## vLLM
 
 ```bash
-python week18_minillava_hf_vllm/scripts/vllm_openai_server.py \
+conda run -n vllm_test python week18_minillava_hf_vllm/scripts/vllm_openai_server.py \
   --model-path week18_minillava_hf_vllm/outputs/minillava-hf \
-  --served-model-name minillava
+  --served-model-name minillava \
+  --host 0.0.0.0 \
+  --port 8000 \
+  --dtype float16 \
+  --gpu-memory-utilization 0.3
 ```
 
-This custom architecture still depends on vLLM support for the exported `minillava` model type. If the installed vLLM version rejects the architecture, use the Transformers script as the functional validation path first, then add a vLLM model executor/plugin for production serving.
 
 ## Notes
 

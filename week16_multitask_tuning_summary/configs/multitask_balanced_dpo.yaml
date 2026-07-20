@@ -65,14 +65,14 @@ TRAINING:
     MAX_NORM: 1.0
   CHECKPOINT:
     LOAD_PATH: week16_multitask_tuning_summary/outputs/checkpoints/multitask_balanced/sft/best.pt
-    SAVE_DIR: "week16_multitask_tuning_summary/outputs/checkpoints/multitask_balanced"
-    SAVE_STEPS: 500
+    SAVE_DIR: "week16_multitask_tuning_summary/outputs/checkpoints/multitask_balanced/dpo"
+    SAVE_STEPS: 5000
     SAVE_TOTAL_LIMIT: 3
   LOGGING:
-    LOG_DIR: "week16_multitask_tuning_summary/outputs/logs/multitask_balanced"
+    LOG_DIR: "week16_multitask_tuning_summary/outputs/logs/multitask_balanced/dpo"
     LOG_STEPS: 10
 INFERENCE:
-  LOG_FILE: "week16_multitask_tuning_summary/outputs/logs/multitask_balanced/infer.jsonl"
+  LOG_FILE: "week16_multitask_tuning_summary/outputs/logs/multitask_balanced/dpo/infer.jsonl"
   GENERATION:
     MAX_NEW_TOKENS: 1024
     TEMPERATURE: 0.7
@@ -90,7 +90,7 @@ MISC:
 DPO:
   TRAIN_FILE: "dataset/VLFeedback"  # DPO 数据来源：本地 VLFeedback、Hub 名称或普通 JSON/JSONL
   IMAGE_ROOT: null  # 普通 JSON/JSONL 中 image 为相对路径时使用；VLFeedback 通常不需要
-  CHECKPOINT: "week16_multitask_tuning_summary/outputs/checkpoints/multitask_balanced/step_15522.pt"  # 可选：SFT checkpoint 路径，policy/reference 都从这里初始化
+  CHECKPOINT: "week16_multitask_tuning_summary/outputs/checkpoints/multitask_balanced/sft/best.pt"  # 可选：SFT checkpoint 路径，policy/reference 都从这里初始化
   SAVE_EXAMPLE_DATA: null  # 可选：只导出 DPO 示例 JSONL 后退出
   EXAMPLE_IMAGE: null  # 生成示例数据或 toy data 时使用的图片
   MAX_SAMPLES: null  # 调试时只取前 N 条偏好样本

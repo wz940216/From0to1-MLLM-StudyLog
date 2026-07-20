@@ -53,7 +53,7 @@ class LLMDecoder(torch.nn.Module):
         if self.tokenizer.pad_token_id is None:
             # 因果语言模型常常没有 pad token。训练 batch padding 时复用 eos 最稳妥。
             self.tokenizer.pad_token = self.tokenizer.eos_token
-        additional_special_tokens = list(self.tokenizer.additional_special_tokens)
+        additional_special_tokens = list(getattr(self.tokenizer, "additional_special_tokens", []) or [])
         if self.image_token not in additional_special_tokens:
             added_tokens = self.tokenizer.add_special_tokens({
                 "additional_special_tokens": additional_special_tokens + [self.image_token]
@@ -103,6 +103,8 @@ class LLMDecoder(torch.nn.Module):
         MiniLLaVA 的图片部分没有 token id，因此不能走普通 input_ids 路径；
         需要由外部先把视觉 embedding 和文本 embedding 拼好，再传给 LLM。
         """
+        model_dtype = next(self.model.parameters()).dtype
+        inputs_embeds = inputs_embeds.to(dtype=model_dtype)
         outputs = self.model(
             inputs_embeds=inputs_embeds,
             attention_mask=attention_mask,

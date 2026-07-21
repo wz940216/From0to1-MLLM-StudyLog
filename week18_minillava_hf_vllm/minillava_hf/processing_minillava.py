@@ -38,6 +38,12 @@ class MiniLlavaProcessor(ProcessorMixin):
     def image_token_id(self):
         return self.tokenizer.convert_tokens_to_ids(self.image_token)
 
+    def decode(self, *args, **kwargs):
+        return self.tokenizer.decode(*args, **kwargs)
+
+    def batch_decode(self, *args, **kwargs):
+        return self.tokenizer.batch_decode(*args, **kwargs)
+
     def _get_num_multimodal_tokens(self, image_sizes=None, **kwargs):
         image_sizes = image_sizes or []
         image_processor = self.image_processor

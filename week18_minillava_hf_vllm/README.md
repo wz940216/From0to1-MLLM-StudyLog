@@ -17,8 +17,8 @@ The model keeps the week16 behavior: one `<image>` token in the prompt is replac
 
 ```bash
 python week18_minillava_hf_vllm/scripts/convert_week16_to_hf.py \
-  --config week16_multitask_tuning_summary/configs/multitask_balanced_sft.yaml \
-  --checkpoint week16_multitask_tuning_summary/outputs/checkpoints/multitask_balanced/sft/best.pt \
+  --config week16_multitask_tuning_summary/configs/multitask_balanced_dpo.yaml \
+  --checkpoint week16_multitask_tuning_summary/outputs/checkpoints/multitask_balanced/dpo/last.pt \
   --output-dir week18_minillava_hf_vllm/outputs/minillava-hf
 ```
 
@@ -62,6 +62,40 @@ conda run -n vllm_test python week18_minillava_hf_vllm/scripts/vllm_openai_serve
   --port 8000 \
   --dtype float16 \
   --gpu-memory-utilization 0.3
+
+
+# test
+curl http://127.0.0.1:8000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "minillava",
+    "messages": [
+      {"role": "user", "content": "你好，请用一句话介绍你自己。"}
+    ],
+    "max_tokens": 64
+  }'
+
+
+curl http://127.0.0.1:8000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "minillava",
+    "messages": [{
+      "role": "user",
+      "content": [
+        {"type": "text", "text": "请描述这张图片。"},
+        {
+          "type": "image_url",
+          "uuid": "coco-000000000025",
+          "image_url": {
+            "url": "file:///gemini/data-1/code/mllm/dataset/coco128/images/train2017/000000000025.jpg"
+          }
+        }
+      ]
+    }],
+    "max_tokens": 128
+  }'
+
 ```
 
 

@@ -628,7 +628,7 @@ curl http://127.0.0.1:8000/v1/chat/completions \
           "type": "image_url",
           "uuid": "coco-000000000025",
           "image_url": {
-            "url": "file:///gemini/data-1/code/mllm/dataset/coco128/images/train2017/000000000025.jpg"
+            "url": "file:///mllm/dataset/coco128/images/train2017/000000000025.jpg"
           }
         }
       ]

@@ -9,7 +9,7 @@ MINILLAVA:
   LLM_DECODER:
     MODEL_PATH: "models/Qwen1.5-1.8B"
     FREEZE: true
-    LR: 1e-5
+    LR: 1e-6
     LORA_R: 16
     LORA_ALPHA: 32
     LORA_DROPOUT: 0.05
@@ -58,15 +58,15 @@ TRAINING:
     WEIGHT_DECAY: 0.01
     BETAS: [0.9, 0.999]
   SCHEDULER:
-    TYPE: "cosine"
+    TYPE: "linear"
     WARMUP_STEPS: 100
-    NUM_EPOCHS: 3
+    NUM_EPOCHS: 1
   GRAD_CLIP:
     MAX_NORM: 1.0
   CHECKPOINT:
     LOAD_PATH: week16_multitask_tuning_summary/outputs/checkpoints/multitask_balanced/sft/best.pt
     SAVE_DIR: "week16_multitask_tuning_summary/outputs/checkpoints/multitask_balanced/dpo"
-    SAVE_STEPS: 5000
+    SAVE_STEPS: 250
     SAVE_TOTAL_LIMIT: 3
   LOGGING:
     LOG_DIR: "week16_multitask_tuning_summary/outputs/logs/multitask_balanced/dpo"
@@ -94,6 +94,10 @@ DPO:
   SAVE_EXAMPLE_DATA: null  # 可选：只导出 DPO 示例 JSONL 后退出
   EXAMPLE_IMAGE: null  # 生成示例数据或 toy data 时使用的图片
   MAX_SAMPLES: null  # 调试时只取前 N 条偏好样本
+  MAX_STEPS: 1000  # DPO 容易过优化；先短跑并从 step_250/500/750/1000 选择生成最稳定的 checkpoint
+  PROBE_IMAGE: "dataset/coco128/images/train2017/000000000025.jpg"  # 每隔 SAVE_STEPS 用这张固定图片生成一次样例
+  PROBE_QUESTION: "请描述图中的主要内容。"  # 每隔 SAVE_STEPS 写入 train_dpo.jsonl 的固定问题
+  PROBE_MAX_NEW_TOKENS: 1024
   BETA: 0.1  # DPO beta，越大表示偏好约束越强
   TOY_DATA: false  # true 时不加载 VLFeedback，只使用内置两条小样本
 

@@ -72,12 +72,14 @@ class MiniLlavaModel(torch.nn.Module):
         if labels is not None:
             labels = labels.to(self.device)
 
-        # 1. 图片 -> CLIP patch 特征 -> projector -> LLM hidden_size。
-        image_features = self.vision_encoder(images)
-        projected_image_features = self.projector(image_features)
-
-        # 2. input_ids -> 文本 embedding。这里复用 LLM 自己的词向量表，保证空间一致。
+        # 1. input_ids -> 文本 embedding。这里复用 LLM 自己的词向量表，保证空间一致。
         text_embeddings = self.language_decoder.get_input_embeddings()(input_ids)
+
+        # 2. 图片 -> CLIP patch 特征 -> projector -> LLM hidden_size。
+        # generate() 会直接把 inputs_embeds 传给底层 LLM，必须提前对齐到 LLM embedding dtype。
+        projector_dtype = next(self.projector.parameters()).dtype
+        image_features = self.vision_encoder(images).to(dtype=projector_dtype)
+        projected_image_features = self.projector(image_features).to(dtype=text_embeddings.dtype)
         image_token_id = self.language_decoder.image_token_id
         image_token_num = projected_image_features.size(1)
 
@@ -139,7 +141,7 @@ class MiniLlavaModel(torch.nn.Module):
         hidden_size = row_embeddings[0].size(-1)
         
         # batch 内不同样本的长度可能不一样，这里统一 pad 到 max_length。视觉特征部分的 padding 不会被 attention mask 和 labels 关注到。
-        combined_inputs = projected_image_features.new_zeros(
+        combined_inputs = text_embeddings.new_zeros(
             len(row_embeddings),
             max_length,
             hidden_size

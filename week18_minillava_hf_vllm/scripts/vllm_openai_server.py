@@ -1,6 +1,7 @@
 """Start an OpenAI-compatible vLLM server for the exported MiniLLaVA directory."""
 
 import argparse
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -29,6 +30,16 @@ def parse_args():
 def main():
     args = parse_args()
     model_path = str(Path(args.model_path).resolve())
+    conversion_meta_path = Path(model_path) / "conversion_meta.json"
+    if conversion_meta_path.exists():
+        with open(conversion_meta_path, "r", encoding="utf-8") as f:
+            conversion_meta = json.load(f)
+        if conversion_meta.get("target") != "vllm":
+            raise SystemExit(
+                f"{model_path} was exported with target="
+                f"{conversion_meta.get('target')!r}. Re-run "
+                "convert_week16_to_hf.py with --target vllm before starting vLLM."
+            )
     command = [
         sys.executable,
         "-m",

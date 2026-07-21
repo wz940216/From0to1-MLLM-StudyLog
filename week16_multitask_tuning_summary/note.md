@@ -109,6 +109,5 @@ accelerate launch --num_processes 4 week16_multitask_tuning_summary/code/train.p
 # freeze vision encoder
 # freeze projector
 # train LLM LoRA
-# 三个epoch
 accelerate launch --num_processes 4 week16_multitask_tuning_summary/code/train_dpo.py  --config week16_multitask_tuning_summary/configs/multitask_balanced_dpo.yaml
 ```

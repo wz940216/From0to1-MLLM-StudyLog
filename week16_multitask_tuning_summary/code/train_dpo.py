@@ -363,6 +363,59 @@ def optional_path(value):
     return value
 
 
+
+
+def run_probe_generation(accelerator, model, config, step, train_log_path):
+    """在 DPO 训练中用固定图片/问题生成一条样例，写入训练 JSONL 日志。"""
+    if not accelerator.is_main_process:
+        return
+
+    dpo_config = config.get("DPO", {})
+    probe_image = optional_path(dpo_config.get("PROBE_IMAGE"))
+    probe_question = optional_path(dpo_config.get("PROBE_QUESTION"))
+    if probe_image is None or probe_question is None:
+        return
+
+    gen_config = config.get("INFERENCE", {}).get("GENERATION", {})
+    max_new_tokens = int(dpo_config.get("PROBE_MAX_NEW_TOKENS", 128))
+    unwrapped_model = accelerator.unwrap_model(model)
+    was_training = unwrapped_model.training
+
+    try:
+        image = Image.open(probe_image).convert("RGB")
+        with torch.no_grad():
+            outputs = unwrapped_model.generate(
+                images=[image],
+                prompts=[probe_question],
+                max_new_tokens=max_new_tokens,
+                temperature=float(gen_config.get("TEMPERATURE", 0.7)),
+                do_sample=bool(gen_config.get("DO_SAMPLE", True)),
+                top_p=float(gen_config.get("TOP_P", 0.9)),
+                top_k=int(gen_config.get("TOP_K", 50)),
+                repetition_penalty=float(gen_config.get("REPETITION_PENALTY", 1.1)),
+            )
+        append_jsonl(train_log_path, {
+            "event": "dpo_probe_generation",
+            "time": datetime.now().isoformat(timespec="seconds"),
+            "step": step,
+            "image": probe_image,
+            "question": probe_question,
+            "answer": outputs[0] if outputs else "",
+            "max_new_tokens": max_new_tokens,
+        })
+    except Exception as exc:
+        append_jsonl(train_log_path, {
+            "event": "dpo_probe_generation_error",
+            "time": datetime.now().isoformat(timespec="seconds"),
+            "step": step,
+            "image": probe_image,
+            "question": probe_question,
+            "error": str(exc),
+        })
+    finally:
+        if was_training:
+            unwrapped_model.train()
+
 def parse_args_and_config():
     """先读取 --config，再用配置里的 DPO 字段作为命令行默认值。"""
     config_parser = argparse.ArgumentParser(add_help=False)
@@ -378,6 +431,7 @@ def parse_args_and_config():
     parser.add_argument("--save-example-data", default=dpo_config.get("SAVE_EXAMPLE_DATA"), help="只保存一份 DPO 示例 JSONL 后退出")
     parser.add_argument("--example-image", default=dpo_config.get("EXAMPLE_IMAGE"), help="生成示例数据或无 train-file 调试时使用的图片")
     parser.add_argument("--max-samples", type=int, default=dpo_config.get("MAX_SAMPLES"), help="调试时只取前 N 条偏好数据")
+    parser.add_argument("--max-steps", type=int, default=dpo_config.get("MAX_STEPS"), help="DPO 最多训练多少个 optimizer step；为空则跑完整 epoch")
     parser.add_argument("--beta", type=float, default=float(dpo_config.get("BETA", 0.1)), help="DPO beta，越大表示偏好约束越强")
     parser.add_argument("--toy-data", action=argparse.BooleanOptionalAction, default=bool(dpo_config.get("TOY_DATA", False)), help="是否不加载 VLFeedback，只使用内置两条小样本调试")
     args = parser.parse_args()
@@ -387,6 +441,8 @@ def parse_args_and_config():
     args.checkpoint = optional_path(args.checkpoint)
     args.save_example_data = optional_path(args.save_example_data)
     args.example_image = optional_path(args.example_image)
+    if args.max_steps is not None and int(args.max_steps) <= 0:
+        args.max_steps = None
     return args, config
 
 
@@ -444,9 +500,10 @@ def main():
         dataloader,
     )
     total_steps = len(dataloader) * num_epochs
-    scheduler = build_scheduler(optimizer, config, total_steps)
-    if scheduler is not None:
-        scheduler = accelerator.prepare(scheduler)
+    planned_steps = min(total_steps, int(args.max_steps)) if args.max_steps is not None else total_steps
+    # Accelerator.prepare(scheduler) 会按进程数调整 scheduler 步数；这里的 planned_steps
+    # 已经是每个进程实际执行的 optimizer step，所以 scheduler 不再交给 prepare 缩放。
+    scheduler = build_scheduler(optimizer, config, planned_steps)
 
     log_steps = int(config["TRAINING"]["LOGGING"]["LOG_STEPS"])
     log_dir = config["TRAINING"]["LOGGING"].get("LOG_DIR", "week15_safety_alignment/outputs/logs")
@@ -480,10 +537,13 @@ def main():
             "checkpoint": args.checkpoint,
             "num_epochs": num_epochs,
             "total_steps": total_steps,
+            "planned_steps": planned_steps,
+            "max_steps": args.max_steps,
             "beta": args.beta,
         })
 
     global_step = 0
+    stop_training = False
     for epoch in range(num_epochs):
         for batch in dataloader:
             chosen = move_tensor_batch_to_device(batch["chosen"], accelerator.device)
@@ -535,8 +595,24 @@ def main():
                 })
 
             if global_step % save_steps == 0:
+                run_probe_generation(accelerator, policy_model, config, global_step, train_log_path)
                 accelerator.wait_for_everyone()
-                save_checkpoint(accelerator, policy_model, optimizer, scheduler, global_step, save_dir)
+                save_checkpoint(
+                    accelerator,
+                    policy_model,
+                    optimizer,
+                    scheduler,
+                    global_step,
+                    save_dir,
+                    filename=f"step_{global_step}.pt",
+                )
+
+            if args.max_steps is not None and global_step >= int(args.max_steps):
+                stop_training = True
+                break
+
+        if stop_training:
+            break
 
     accelerator.wait_for_everyone()
     save_checkpoint(accelerator, policy_model, optimizer, scheduler, global_step, save_dir)

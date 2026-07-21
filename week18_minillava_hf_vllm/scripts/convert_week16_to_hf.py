@@ -204,6 +204,8 @@ def convert(args):
     copy_custom_code(output_dir)
     write_readme(output_dir, args.config, args.checkpoint, target=args.target)
     print(f"Saved HF MiniLLaVA model to: {output_dir}")
+    if args.target != "vllm":
+        print("Note: vLLM serving requires a separate export with --target vllm.")
 
 
 def parse_args():

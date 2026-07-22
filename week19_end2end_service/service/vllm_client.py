@@ -25,6 +25,7 @@ class VllmChatClient:
         max_tokens: int,
         temperature: float,
     ) -> str:
+        # vLLM 启动的是 OpenAI-compatible server，所以请求体与 /v1/chat/completions 对齐。
         payload = {
             "model": self.model,
             "messages": messages,
@@ -32,6 +33,7 @@ class VllmChatClient:
             "temperature": temperature,
         }
         try:
+            # FastAPI 服务本身不加载模型，只把整理好的多模态 messages 转发给 vLLM。
             response = await self._client.post(f"{self.base_url}/v1/chat/completions", json=payload)
             response.raise_for_status()
         except httpx.HTTPStatusError as exc:
@@ -42,6 +44,7 @@ class VllmChatClient:
 
         data = response.json()
         try:
+            # OpenAI Chat Completions 的文本结果位于 choices[0].message.content。
             return data["choices"][0]["message"]["content"]
         except (KeyError, IndexError, TypeError) as exc:
             raise HTTPException(status_code=502, detail=f"unexpected vLLM response: {data}") from exc

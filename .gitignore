@@ -7,6 +7,7 @@ models/Llama-3.1-8B-Instruct
 models/llava-1.5-7b-hf
 models/Qwen1.5-1.8B-Chat
 models/Qwen1.5-1.8B
+models/Qwen3-VL-8B-Instruct
 
 week02_sft_lora_qlora/code/Qwen1.5-1.8B-Chat-lora
 week02_sft_lora_qlora/code/my_alpaca_val_dataset
@@ -33,6 +34,7 @@ dataset/VQA
 dataset/VLFeedback
 dataset/LLaVA-Instruct-150K
 dataset/coco2017
+
 
 
 

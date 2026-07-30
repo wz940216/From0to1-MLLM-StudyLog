@@ -19,6 +19,8 @@ def parse_args():
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--dtype", default="float16")
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.85)
+    parser.add_argument("--tensor-parallel-size", type=int, default=1)
+    parser.add_argument("--pipeline-parallel-size", type=int, default=1)
     parser.add_argument("--model-impl", default="transformers", choices=["auto", "vllm", "transformers"])
     parser.add_argument("--max-model-len", type=int, default=1024)
     parser.add_argument("--enforce-eager", action="store_true", default=True)
@@ -59,6 +61,10 @@ def main():
         "--trust-remote-code",
         "--gpu-memory-utilization",
         str(args.gpu_memory_utilization),
+        "--tensor-parallel-size",
+        str(args.tensor_parallel_size),
+        "--pipeline-parallel-size",
+        str(args.pipeline_parallel_size),
         "--model-impl",
         args.model_impl,
         "--max-model-len",

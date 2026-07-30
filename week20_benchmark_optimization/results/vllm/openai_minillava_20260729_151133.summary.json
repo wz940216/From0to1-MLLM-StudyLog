@@ -1,0 +1,14 @@
+{
+  "total_requests": 100,
+  "successful_requests": 100,
+  "failed_requests": 0,
+  "total_time_s": 51.497,
+  "request_throughput": 1.941873,
+  "output_token_throughput": 87.190105,
+  "latency_ms_avg": 1950.679,
+  "latency_ms_p50": 1949.51,
+  "latency_ms_p90": 2050.659,
+  "latency_ms_p95": 2059.691,
+  "latency_ms_p99": 2087.897,
+  "result_file": "/root/zheng/code/mllm/week20_benchmark_optimization/results/vllm/openai_minillava_20260729_151133.jsonl"
+}

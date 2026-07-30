@@ -1,0 +1,2 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+POST,POST /chat,"CatchResponseError('unexpected status=503: {""detail"":""request queue timeout""}')",4,2026-07-29T06:44:00Z,2026-07-29T06:44:01Z

@@ -19,4 +19,5 @@ hf download openai/clip-vit-base-patch16 --local-dir models/clip-vit-base-patch1
 hf download llava-hf/llava-1.5-7b-hf --local-dir models/llava-1.5-7b-hf
 hf download Qwen/Qwen1.5-1.8B-Chat --local-dir models/Qwen1.5-1.8B-Chat
 hf download Qwen/Qwen1.5-1.8B --local-dir models/Qwen1.5-1.8B
+modelscope download --model Qwen/Qwen3-VL-8B-Instruct --local-dir models/Qwen3-VL-8B-Instruct
 ```

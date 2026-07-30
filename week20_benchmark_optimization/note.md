@@ -136,7 +136,7 @@ CONDA_ENV_NAME=mllm \
 bash week20_benchmark_optimization/start_fastapi_service.sh
 ```
 
-压测时建议把 `MINILLAVA_RATE_LIMIT_PER_MIN` 调大，避免测到限流。
+压测时可以把 `MINILLAVA_RATE_LIMIT_PER_MIN` 调大，避免测到限流。
 
 然后启动压测程序：
 
@@ -422,7 +422,7 @@ End-to-End Latency：
 
 Percentile
 
-建议输出完整分位数：
+可以输出完整分位数：
 
 ```bash
 --percentile-metrics ttft,tpot,itl,e2el \

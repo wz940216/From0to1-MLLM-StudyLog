@@ -15,4 +15,7 @@ hf download liuhaotian/LLaVA-Instruct-150K --repo-type=dataset --local-dir datas
 # dpo 数据集 MMInstruction/VLFeedback
 hf download MMInstruction/VLFeedback --repo-type=dataset --local-dir dataset/VLFeedback
 
+# XFUND数据集
+https://github.com/doc-analysis/XFUND/releases/tag/v1.0
+
 ```

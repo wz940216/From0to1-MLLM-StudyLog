@@ -1,0 +1,112 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "week22 debug module",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "console": "integratedTerminal",
+            "args": [
+                "week22_project_core_impl.service.app:app",
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "9100"
+            ],
+            "env": {
+                "DOC_QA_PRELOAD_VLM": "false"
+            }
+        },   
+        {
+            "name": "qwen3_vl_inference",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "week21_project_design/qwen3_vl_inference.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--markdown",
+                "week21_project_design/output/BLIP.md"
+            ]
+        },
+        {
+            "name": "Python 调试程序: 当前文件",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "w17_test",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "week17_llm_inference_vllm/code/vllm_qwen15_benchmark.py",
+            "console": "integratedTerminal",
+            "env": {
+                "CUDA_VISIBLE_DEVICES": "0"
+            },
+            "args": [
+                "bench-vllm",
+                "--num-requests",
+                "8",
+                "--concurrency",
+                "2",
+                "--max-new-tokens",
+                "32",
+                "--dtype",
+                "float16",
+                "--gpu-memory-utilization",
+                "0.20"
+            ]
+        },
+        {
+            "name": "sft_infer",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [
+                "infer",
+                "--base_model_name",
+                "models/Qwen1.5-1.8B-Chat",
+                "--lora_weights",
+                "week2/Qwen1.5-1.8B-Chat-lora/checkpoint-2000",
+                "--instruction",
+                "'给出三个保持健康的建议。'"
+            ]
+        },
+        {
+            "name": "w15_train_dpo",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "week15_safety_alignment/code/train_dpo.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--config",
+                "week15_safety_alignment/configs/multitask_balanced.yaml",
+            ]
+        },
+        {
+            "name": "sft_train",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [
+                "train",
+                "--model_name_or_path",
+                "models/Qwen1.5-1.8B-Chat",
+                "--train_file",
+                "dataset/alpaca-chinese-dataset/data_v3/alpaca_chinese_part_0.json",
+                "--eval_file",
+                "dataset/alpaca-chinese-dataset/data_v3/alpaca_chinese_part_1.json",
+                "--output_dir",
+                "week2/Qwen1.5-1.8B-Chat-lora",
+                "--num_train_epochs",
+                "2",
+                "--per_device_train_batch_size",
+                "1"
+            ]
+        }
+    ]
+}

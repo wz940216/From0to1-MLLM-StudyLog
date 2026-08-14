@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+python-multipart
+requests
+pillow
+pymupdf
+paddleocr
+paddlex
+paddlepaddle==3.0.0
+torch
+transformers
+accelerate
+pytest

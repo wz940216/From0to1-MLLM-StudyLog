@@ -1,0 +1,5 @@
+{
+  "openai.apiKey": "codex_9301267c60975ca1d9369096bedc6fe677a6c9a760c48826",
+  "openai.apiBase": "https://codex.xxworld.org/v1",
+  "python-envs.defaultEnvManager": "ms-python.python:conda"
+}

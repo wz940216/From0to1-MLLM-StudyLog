@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Week22 Document QA</title>
+  <style>
+    :root { color-scheme: light; --ink:#17202a; --muted:#667085; --line:#d0d5dd; --bg:#f7f8fa; --panel:#fff; --accent:#0f766e; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); }
+    header { padding: 18px 24px; border-bottom: 1px solid var(--line); background: var(--panel); }
+    h1 { margin: 0; font-size: 20px; font-weight: 650; letter-spacing: 0; }
+    main { max-width: 1120px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: 360px 1fr; gap: 20px; }
+    section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 18px; }
+    label { display: block; margin: 14px 0 6px; font-size: 13px; font-weight: 600; color: #344054; }
+    input[type="file"], textarea, input[type="number"] { width: 100%; border: 1px solid var(--line); border-radius: 6px; padding: 10px; font: inherit; background: #fff; }
+    textarea { min-height: 130px; resize: vertical; }
+    .row { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+    .row input[type="number"] { max-width: 92px; }
+    button { width: 100%; margin-top: 16px; border: 0; border-radius: 6px; padding: 11px 14px; background: var(--accent); color: white; font: inherit; font-weight: 650; cursor: pointer; }
+    button:disabled { opacity: .6; cursor: wait; }
+    .muted { color: var(--muted); font-size: 13px; line-height: 1.5; }
+    pre { white-space: pre-wrap; word-break: break-word; background: #101828; color: #f9fafb; padding: 16px; border-radius: 8px; min-height: 260px; overflow: auto; }
+    .meta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+    .metric { border: 1px solid var(--line); border-radius: 8px; padding: 10px; background: #fcfcfd; }
+    .metric span { display: block; color: var(--muted); font-size: 12px; }
+    .metric strong { display: block; margin-top: 4px; font-size: 16px; }
+    a { color: var(--accent); }
+    @media (max-width: 820px) { main { grid-template-columns: 1fr; padding: 14px; } .meta { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header><h1>Week22 Document QA Alpha</h1></header>
+  <main>
+    <section>
+      <form id="qa-form">
+        <label for="pdf">PDF</label>
+        <input id="pdf" name="file" type="file" accept="application/pdf">
+        <div class="row">
+          <input id="default-pdf" type="checkbox" name="use_default_pdf">
+          <label for="default-pdf" style="margin:0;font-weight:500;">使用默认 BLIP.pdf</label>
+        </div>
+        <label for="question">问题</label>
+        <textarea id="question" name="question">根据这篇文章，总结文章创新点</textarea>
+        <label for="max-images">最多送入图片页数</label>
+        <input id="max-images" name="max_images" type="number" min="0" max="32" value="8">
+        <div class="row">
+          <input id="ppstructure" type="checkbox" name="enable_ppstructure">
+          <label for="ppstructure" style="margin:0;font-weight:500;">额外生成 PPStructure Markdown</label>
+        </div>
+        <button id="submit" type="submit">提交问答</button>
+      </form>
+      <p class="muted">服务启动时默认已加载 PaddleOCR 和 Qwen3-VL；提交后会直接处理文档并复用模型推理。结果会持久化到 outputs/request_id。</p>
+    </section>
+    <section>
+      <div class="meta">
+        <div class="metric"><span>Request ID</span><strong id="request-id">-</strong></div>
+        <div class="metric"><span>Selected Pages</span><strong id="pages">-</strong></div>
+        <div class="metric"><span>OCR JSON</span><strong id="ocr-link">-</strong></div>
+      </div>
+      <pre id="answer">等待提交...</pre>
+    </section>
+  </main>
+  <script>
+    const form = document.getElementById("qa-form");
+    const submit = document.getElementById("submit");
+    const answer = document.getElementById("answer");
+    const requestId = document.getElementById("request-id");
+    const pages = document.getElementById("pages");
+    const ocrLink = document.getElementById("ocr-link");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      submit.disabled = true;
+      answer.textContent = "处理中...";
+      requestId.textContent = "-";
+      pages.textContent = "-";
+      ocrLink.textContent = "-";
+
+      const data = new FormData();
+      const useDefault = document.getElementById("default-pdf").checked;
+      const file = document.getElementById("pdf").files[0];
+      data.append("question", document.getElementById("question").value);
+      data.append("use_default_pdf", useDefault ? "true" : "false");
+      data.append("max_images", document.getElementById("max-images").value);
+      data.append("enable_ppstructure", document.getElementById("ppstructure").checked ? "true" : "false");
+      if (!useDefault && file) data.append("file", file);
+
+      try {
+        const response = await fetch("/api/ask", { method: "POST", body: data });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.detail || "request failed");
+        requestId.textContent = payload.request_id;
+        pages.textContent = (payload.selected_pages || []).join(", ") || "-";
+        ocrLink.innerHTML = `<a href="/outputs/${payload.request_id}/ocr.json" target="_blank">ocr.json</a>`;
+        answer.textContent = payload.answer;
+      } catch (error) {
+        answer.textContent = String(error.message || error);
+      } finally {
+        submit.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
+

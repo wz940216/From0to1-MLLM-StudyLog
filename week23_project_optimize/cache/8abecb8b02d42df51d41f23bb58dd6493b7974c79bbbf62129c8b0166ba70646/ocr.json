@@ -1,0 +1,1991 @@
+{
+  "pages": [
+    {
+      "page_number": 1,
+      "image_path": "/gemini/data-1/code/mllm/week23_project_optimize/cache/8abecb8b02d42df51d41f23bb58dd6493b7974c79bbbf62129c8b0166ba70646/pages/page_001.png",
+      "width": 1488,
+      "height": 2105,
+      "text": "BLIP: Bootstrapping Language-Image Pre-training for\nUnified Vision-Language Understanding and Generation\nJunnan Li Dongxu Li Caiming Xiong Steven Hoi\nSalesforce Research\nhttps://github.com/salesforce/BLIP\n  \nAbstract\n\"blue sky bakery in\nsunset park\"\n2\nFilt\nVision-Language Pre-training (VLP) has ad-\n\"chocolate cake\nvanced the performance for many vision-language\nwith cream frosting\ntasks. However, most existing pre-trained mod-\nand chocolate\nFilt\nsprinkles on top\"\nels only excel in either understanding-based tasks\nor generation-based tasks. Furthermore, perfor-\nFigure 1. We use a Captioner (Cap) to generate synthetic captions\nmance improvement has been largely achieved\nfor web images, and a Filter (Filt) to remove noisy captions.\nby scaling up the dataset with noisy image-text\ncollected from the web. Despite the performance gain ob-\npairs collected from the web, which is a subop-\ntained by scaling up the dataset, our paper shows that the\ntimal source of supervision. In this paper, we\nnoisy web text is suboptimal for vision-language learning.\npropose BLIP, a new VLP framework which trans-\nfers flexibly to both vision-language understand-\nTo this end, we propose BLIP: Bootstrapping Language-\ning and generation tasks. BLIP effectively uti-\nImage Pre-training for unified vision-language understand-\nlizes the noisy web data by bootstrapping the\ning and generation. BLIP is a new VLP framework which\ncaptions, where a captioner generates synthetic\nenables a wider range of downstream tasks than existing\ncaptions and a filter removes the noisy ones. We\nmethods. It introduces two contributions from the model\nachieve state-of-the-art results on a wide range of\nand data perspective, respectively:\nvision-language tasks, such as image-text retrieval\n(+2.7% in average recall@1), image captioning\n(a) Multimodal mixture of Encoder-Decoder (MED): a new\nmodel architecture for effective multi-task pre-training and\n(+2.8% in CIDEr), and VQA (+1.6% in VQA\nflexible transfer learning. An MED can operate either as\nscore). BLIP also demonstrates strong general-\nization ability when directly transferred to video\na unimodal encoder, or an image-grounded text encoder,\nor an image-grounded text decoder. The model is jointly\nlanguage tasks in a zero-shot manner. Code, mod-\npre-trained with three vision-language objectives: image-\nels, and datasets are released.\ntext contrastive learning, image-text matching, and image-\nconditioned language modeling.\n1. Introduction\n(b) Captioning and Filtering (CapFilt): a new dataset bos-\nVision-language pre-training has recently received tremen-\ntrapping method for learning from noisy image-text pairs.\nWe finetune a pre-trained MED into two modules: a cap-\ndous success on various multimodal downstream tasks.\nHowever, existing methods have two major limitations:\ntioner to produce synthetic captions given web images, and\na filter to remove noisy captions from both the original web\n(1) Model perspective: most methods either adopt an\ntexts and the synthetic texts.\nencoder-based model (Radford et al., 2021; Li et al., 2021a),\nor an encoder-decoder (Cho et al., 2021; Wang et al, 2021)\nWe perform extensive experiments and analysis, and make\nmodel. However, encoder-based models are less straightfor-\nthe following key observations.\nward to directly transfer to text generation tasks (e.g. image\n•We show that the captioner and the filter work together to\ncaptioning), whereas encoder-decoder models have not been\nachieve substantial performance improvement on various\nsuccessfully adopted for image-text retrieval tasks.\ndownstream tasks by bootstrapping the captions. We also\nfind that more diverse captions yield larger gains.\n(2) Data perspective: most state-of-the-art methods (e.g.,\nCLIP (Radford et al., 2021), ALBEF (Li et all., 2021a),\n•BLIP achieves state-of-the-art performance on a wide\nSimVLM (Wang et al., 2021)) pre-train on image-text pairs\nrange of vision-language tasks, including image-text re-",
+      "blocks": [
+        {
+          "page_number": 1,
+          "text": "BLIP: Bootstrapping Language-Image Pre-training for",
+          "box": [
+            [
+              337.0,
+              348.0
+            ],
+            [
+              1116.0,
+              349.0
+            ],
+            [
+              1116.0,
+              386.0
+            ],
+            [
+              337.0,
+              385.0
+            ]
+          ],
+          "score": 0.9899797439575195
+        },
+        {
+          "page_number": 1,
+          "text": "Unified Vision-Language Understanding and Generation",
+          "box": [
+            [
+              328.0,
+              390.0
+            ],
+            [
+              1124.0,
+              391.0
+            ],
+            [
+              1124.0,
+              425.0
+            ],
+            [
+              328.0,
+              424.0
+            ]
+          ],
+          "score": 0.9921820163726807
+        },
+        {
+          "page_number": 1,
+          "text": "Junnan Li Dongxu Li Caiming Xiong Steven Hoi",
+          "box": [
+            [
+              471.0,
+              509.0
+            ],
+            [
+              976.0,
+              508.0
+            ],
+            [
+              977.0,
+              533.0
+            ],
+            [
+              471.0,
+              534.0
+            ]
+          ],
+          "score": 0.9726424813270569
+        },
+        {
+          "page_number": 1,
+          "text": "Salesforce Research",
+          "box": [
+            [
+              627.0,
+              538.0
+            ],
+            [
+              822.0,
+              538.0
+            ],
+            [
+              822.0,
+              559.0
+            ],
+            [
+              627.0,
+              559.0
+            ]
+          ],
+          "score": 0.9994428753852844
+        },
+        {
+          "page_number": 1,
+          "text": "https://github.com/salesforce/BLIP",
+          "box": [
+            [
+              492.0,
+              565.0
+            ],
+            [
+              958.0,
+              563.0
+            ],
+            [
+              958.0,
+              586.0
+            ],
+            [
+              492.0,
+              588.0
+            ]
+          ],
+          "score": 0.9859246611595154
+        },
+        {
+          "page_number": 1,
+          "text": "  ",
+          "box": [
+            [
+              81.0,
+              624.0
+            ],
+            [
+              128.0,
+              624.0
+            ],
+            [
+              130.0,
+              1430.0
+            ],
+            [
+              83.0,
+              1430.0
+            ]
+          ],
+          "score": 0.4295952022075653
+        },
+        {
+          "page_number": 1,
+          "text": "Abstract",
+          "box": [
+            [
+              387.0,
+              640.0
+            ],
+            [
+              492.0,
+              640.0
+            ],
+            [
+              492.0,
+              665.0
+            ],
+            [
+              387.0,
+              665.0
+            ]
+          ],
+          "score": 0.9999034404754639
+        },
+        {
+          "page_number": 1,
+          "text": "\"blue sky bakery in",
+          "box": [
+            [
+              1024.0,
+              642.0
+            ],
+            [
+              1151.0,
+              642.0
+            ],
+            [
+              1151.0,
+              663.0
+            ],
+            [
+              1024.0,
+              663.0
+            ]
+          ],
+          "score": 0.9530081748962402
+        },
+        {
+          "page_number": 1,
+          "text": "sunset park\"",
+          "box": [
+            [
+              1024.0,
+              662.0
+            ],
+            [
+              1113.0,
+              660.0
+            ],
+            [
+              1113.0,
+              681.0
+            ],
+            [
+              1024.0,
+              683.0
+            ]
+          ],
+          "score": 0.9802359938621521
+        },
+        {
+          "page_number": 1,
+          "text": "2",
+          "box": [
+            [
+              1194.0,
+              658.0
+            ],
+            [
+              1210.0,
+              658.0
+            ],
+            [
+              1210.0,
+              672.0
+            ],
+            [
+              1194.0,
+              672.0
+            ]
+          ],
+          "score": 0.055965423583984375
+        },
+        {
+          "page_number": 1,
+          "text": "Filt",
+          "box": [
+            [
+              1228.0,
+              654.0
+            ],
+            [
+              1262.0,
+              654.0
+            ],
+            [
+              1262.0,
+              678.0
+            ],
+            [
+              1228.0,
+              678.0
+            ]
+          ],
+          "score": 0.9974040389060974
+        },
+        {
+          "page_number": 1,
+          "text": "Vision-Language Pre-training (VLP) has ad-",
+          "box": [
+            [
+              216.0,
+              685.0
+            ],
+            [
+              664.0,
+              685.0
+            ],
+            [
+              664.0,
+              708.0
+            ],
+            [
+              216.0,
+              708.0
+            ]
+          ],
+          "score": 0.9482460021972656
+        },
+        {
+          "page_number": 1,
+          "text": "\"chocolate cake",
+          "box": [
+            [
+              1024.0,
+              697.0
+            ],
+            [
+              1129.0,
+              697.0
+            ],
+            [
+              1129.0,
+              717.0
+            ],
+            [
+              1024.0,
+              717.0
+            ]
+          ],
+          "score": 0.984152615070343
+        },
+        {
+          "page_number": 1,
+          "text": "vanced the performance for many vision-language",
+          "box": [
+            [
+              214.0,
+              712.0
+            ],
+            [
+              662.0,
+              714.0
+            ],
+            [
+              662.0,
+              738.0
+            ],
+            [
+              214.0,
+              736.0
+            ]
+          ],
+          "score": 0.9909303784370422
+        },
+        {
+          "page_number": 1,
+          "text": "with cream frosting",
+          "box": [
+            [
+              1024.0,
+              717.0
+            ],
+            [
+              1153.0,
+              717.0
+            ],
+            [
+              1153.0,
+              737.0
+            ],
+            [
+              1024.0,
+              737.0
+            ]
+          ],
+          "score": 0.9436414837837219
+        },
+        {
+          "page_number": 1,
+          "text": "tasks. However, most existing pre-trained mod-",
+          "box": [
+            [
+              216.0,
+              743.0
+            ],
+            [
+              664.0,
+              743.0
+            ],
+            [
+              664.0,
+              762.0
+            ],
+            [
+              216.0,
+              762.0
+            ]
+          ],
+          "score": 0.9751859903335571
+        },
+        {
+          "page_number": 1,
+          "text": "and chocolate",
+          "box": [
+            [
+              1025.0,
+              736.0
+            ],
+            [
+              1118.0,
+              736.0
+            ],
+            [
+              1118.0,
+              752.0
+            ],
+            [
+              1025.0,
+              752.0
+            ]
+          ],
+          "score": 0.987962007522583
+        },
+        {
+          "page_number": 1,
+          "text": "Filt",
+          "box": [
+            [
+              1228.0,
+              738.0
+            ],
+            [
+              1261.0,
+              738.0
+            ],
+            [
+              1261.0,
+              761.0
+            ],
+            [
+              1228.0,
+              761.0
+            ]
+          ],
+          "score": 0.9964948892593384
+        },
+        {
+          "page_number": 1,
+          "text": "sprinkles on top\"",
+          "box": [
+            [
+              1023.0,
+              754.0
+            ],
+            [
+              1136.0,
+              751.0
+            ],
+            [
+              1136.0,
+              773.0
+            ],
+            [
+              1023.0,
+              776.0
+            ]
+          ],
+          "score": 0.9635980129241943
+        },
+        {
+          "page_number": 1,
+          "text": "els only excel in either understanding-based tasks",
+          "box": [
+            [
+              217.0,
+              769.0
+            ],
+            [
+              662.0,
+              769.0
+            ],
+            [
+              662.0,
+              789.0
+            ],
+            [
+              217.0,
+              789.0
+            ]
+          ],
+          "score": 0.9959940314292908
+        },
+        {
+          "page_number": 1,
+          "text": "or generation-based tasks. Furthermore, perfor-",
+          "box": [
+            [
+              214.0,
+              796.0
+            ],
+            [
+              665.0,
+              794.0
+            ],
+            [
+              665.0,
+              817.0
+            ],
+            [
+              214.0,
+              819.0
+            ]
+          ],
+          "score": 0.9797587990760803
+        },
+        {
+          "page_number": 1,
+          "text": "Figure 1. We use a Captioner (Cap) to generate synthetic captions",
+          "box": [
+            [
+              747.0,
+              797.0
+            ],
+            [
+              1282.0,
+              797.0
+            ],
+            [
+              1282.0,
+              817.0
+            ],
+            [
+              747.0,
+              817.0
+            ]
+          ],
+          "score": 0.9610558748245239
+        },
+        {
+          "page_number": 1,
+          "text": "mance improvement has been largely achieved",
+          "box": [
+            [
+              215.0,
+              824.0
+            ],
+            [
+              662.0,
+              823.0
+            ],
+            [
+              662.0,
+              844.0
+            ],
+            [
+              215.0,
+              845.0
+            ]
+          ],
+          "score": 0.9826356768608093
+        },
+        {
+          "page_number": 1,
+          "text": "for web images, and a Filter (Filt) to remove noisy captions.",
+          "box": [
+            [
+              746.0,
+              821.0
+            ],
+            [
+              1238.0,
+              822.0
+            ],
+            [
+              1238.0,
+              843.0
+            ],
+            [
+              746.0,
+              842.0
+            ]
+          ],
+          "score": 0.9559706449508667
+        },
+        {
+          "page_number": 1,
+          "text": "by scaling up the dataset with noisy image-text",
+          "box": [
+            [
+              215.0,
+              850.0
+            ],
+            [
+              663.0,
+              850.0
+            ],
+            [
+              663.0,
+              873.0
+            ],
+            [
+              215.0,
+              873.0
+            ]
+          ],
+          "score": 0.9832572340965271
+        },
+        {
+          "page_number": 1,
+          "text": "collected from the web. Despite the performance gain ob-",
+          "box": [
+            [
+              747.0,
+              868.0
+            ],
+            [
+              1284.0,
+              868.0
+            ],
+            [
+              1284.0,
+              888.0
+            ],
+            [
+              747.0,
+              888.0
+            ]
+          ],
+          "score": 0.9771031737327576
+        },
+        {
+          "page_number": 1,
+          "text": "pairs collected from the web, which is a subop-",
+          "box": [
+            [
+              217.0,
+              879.0
+            ],
+            [
+              663.0,
+              879.0
+            ],
+            [
+              663.0,
+              899.0
+            ],
+            [
+              217.0,
+              899.0
+            ]
+          ],
+          "score": 0.9565392136573792
+        },
+        {
+          "page_number": 1,
+          "text": "tained by scaling up the dataset, our paper shows that the",
+          "box": [
+            [
+              745.0,
+              894.0
+            ],
+            [
+              1283.0,
+              893.0
+            ],
+            [
+              1283.0,
+              916.0
+            ],
+            [
+              745.0,
+              917.0
+            ]
+          ],
+          "score": 0.9691783785820007
+        },
+        {
+          "page_number": 1,
+          "text": "timal source of supervision. In this paper, we",
+          "box": [
+            [
+              216.0,
+              905.0
+            ],
+            [
+              662.0,
+              907.0
+            ],
+            [
+              662.0,
+              928.0
+            ],
+            [
+              216.0,
+              926.0
+            ]
+          ],
+          "score": 0.9752315878868103
+        },
+        {
+          "page_number": 1,
+          "text": "noisy web text is suboptimal for vision-language learning.",
+          "box": [
+            [
+              746.0,
+              922.0
+            ],
+            [
+              1276.0,
+              922.0
+            ],
+            [
+              1276.0,
+              945.0
+            ],
+            [
+              746.0,
+              945.0
+            ]
+          ],
+          "score": 0.9754087328910828
+        },
+        {
+          "page_number": 1,
+          "text": "propose BLIP, a new VLP framework which trans-",
+          "box": [
+            [
+              214.0,
+              933.0
+            ],
+            [
+              665.0,
+              931.0
+            ],
+            [
+              665.0,
+              954.0
+            ],
+            [
+              214.0,
+              956.0
+            ]
+          ],
+          "score": 0.9628131985664368
+        },
+        {
+          "page_number": 1,
+          "text": "fers flexibly to both vision-language understand-",
+          "box": [
+            [
+              216.0,
+              961.0
+            ],
+            [
+              662.0,
+              961.0
+            ],
+            [
+              662.0,
+              981.0
+            ],
+            [
+              216.0,
+              981.0
+            ]
+          ],
+          "score": 0.9565302133560181
+        },
+        {
+          "page_number": 1,
+          "text": "To this end, we propose BLIP: Bootstrapping Language-",
+          "box": [
+            [
+              745.0,
+              962.0
+            ],
+            [
+              1286.0,
+              962.0
+            ],
+            [
+              1286.0,
+              985.0
+            ],
+            [
+              745.0,
+              985.0
+            ]
+          ],
+          "score": 0.9910404086112976
+        },
+        {
+          "page_number": 1,
+          "text": "ing and generation tasks. BLIP effectively uti-",
+          "box": [
+            [
+              214.0,
+              987.0
+            ],
+            [
+              664.0,
+              986.0
+            ],
+            [
+              664.0,
+              1009.0
+            ],
+            [
+              214.0,
+              1010.0
+            ]
+          ],
+          "score": 0.9656980633735657
+        },
+        {
+          "page_number": 1,
+          "text": "Image Pre-training for unified vision-language understand-",
+          "box": [
+            [
+              746.0,
+              990.0
+            ],
+            [
+              1286.0,
+              990.0
+            ],
+            [
+              1286.0,
+              1013.0
+            ],
+            [
+              746.0,
+              1013.0
+            ]
+          ],
+          "score": 0.9814962148666382
+        },
+        {
+          "page_number": 1,
+          "text": "lizes the noisy web data by bootstrapping the",
+          "box": [
+            [
+              215.0,
+              1014.0
+            ],
+            [
+              660.0,
+              1015.0
+            ],
+            [
+              660.0,
+              1036.0
+            ],
+            [
+              215.0,
+              1035.0
+            ]
+          ],
+          "score": 0.9578847885131836
+        },
+        {
+          "page_number": 1,
+          "text": "ing and generation. BLIP is a new VLP framework which",
+          "box": [
+            [
+              746.0,
+              1018.0
+            ],
+            [
+              1283.0,
+              1017.0
+            ],
+            [
+              1283.0,
+              1038.0
+            ],
+            [
+              746.0,
+              1039.0
+            ]
+          ],
+          "score": 0.9806798100471497
+        },
+        {
+          "page_number": 1,
+          "text": "captions, where a captioner generates synthetic",
+          "box": [
+            [
+              216.0,
+              1043.0
+            ],
+            [
+              660.0,
+              1042.0
+            ],
+            [
+              660.0,
+              1062.0
+            ],
+            [
+              216.0,
+              1063.0
+            ]
+          ],
+          "score": 0.9745621085166931
+        },
+        {
+          "page_number": 1,
+          "text": "enables a wider range of downstream tasks than existing",
+          "box": [
+            [
+              746.0,
+              1045.0
+            ],
+            [
+              1284.0,
+              1045.0
+            ],
+            [
+              1284.0,
+              1067.0
+            ],
+            [
+              746.0,
+              1067.0
+            ]
+          ],
+          "score": 0.9753278493881226
+        },
+        {
+          "page_number": 1,
+          "text": "captions and a filter removes the noisy ones. We",
+          "box": [
+            [
+              216.0,
+              1069.0
+            ],
+            [
+              661.0,
+              1068.0
+            ],
+            [
+              661.0,
+              1089.0
+            ],
+            [
+              216.0,
+              1090.0
+            ]
+          ],
+          "score": 0.9653841853141785
+        },
+        {
+          "page_number": 1,
+          "text": "methods. It introduces two contributions from the model",
+          "box": [
+            [
+              747.0,
+              1072.0
+            ],
+            [
+              1282.0,
+              1072.0
+            ],
+            [
+              1282.0,
+              1092.0
+            ],
+            [
+              747.0,
+              1092.0
+            ]
+          ],
+          "score": 0.9659740328788757
+        },
+        {
+          "page_number": 1,
+          "text": "achieve state-of-the-art results on a wide range of",
+          "box": [
+            [
+              216.0,
+              1096.0
+            ],
+            [
+              661.0,
+              1096.0
+            ],
+            [
+              661.0,
+              1116.0
+            ],
+            [
+              216.0,
+              1116.0
+            ]
+          ],
+          "score": 0.9787378311157227
+        },
+        {
+          "page_number": 1,
+          "text": "and data perspective, respectively:",
+          "box": [
+            [
+              747.0,
+              1100.0
+            ],
+            [
+              1057.0,
+              1100.0
+            ],
+            [
+              1057.0,
+              1120.0
+            ],
+            [
+              747.0,
+              1120.0
+            ]
+          ],
+          "score": 0.9865027070045471
+        },
+        {
+          "page_number": 1,
+          "text": "vision-language tasks, such as image-text retrieval",
+          "box": [
+            [
+              215.0,
+              1124.0
+            ],
+            [
+              662.0,
+              1123.0
+            ],
+            [
+              662.0,
+              1144.0
+            ],
+            [
+              215.0,
+              1145.0
+            ]
+          ],
+          "score": 0.9899254441261292
+        },
+        {
+          "page_number": 1,
+          "text": "(+2.7% in average recall@1), image captioning",
+          "box": [
+            [
+              215.0,
+              1149.0
+            ],
+            [
+              661.0,
+              1149.0
+            ],
+            [
+              661.0,
+              1172.0
+            ],
+            [
+              215.0,
+              1172.0
+            ]
+          ],
+          "score": 0.9692491888999939
+        },
+        {
+          "page_number": 1,
+          "text": "(a) Multimodal mixture of Encoder-Decoder (MED): a new",
+          "box": [
+            [
+              747.0,
+              1140.0
+            ],
+            [
+              1284.0,
+              1140.0
+            ],
+            [
+              1284.0,
+              1163.0
+            ],
+            [
+              747.0,
+              1163.0
+            ]
+          ],
+          "score": 0.9653366804122925
+        },
+        {
+          "page_number": 1,
+          "text": "model architecture for effective multi-task pre-training and",
+          "box": [
+            [
+              746.0,
+              1167.0
+            ],
+            [
+              1283.0,
+              1168.0
+            ],
+            [
+              1283.0,
+              1189.0
+            ],
+            [
+              746.0,
+              1188.0
+            ]
+          ],
+          "score": 0.9877407550811768
+        },
+        {
+          "page_number": 1,
+          "text": "(+2.8% in CIDEr), and VQA (+1.6% in VQA",
+          "box": [
+            [
+              217.0,
+              1177.0
+            ],
+            [
+              660.0,
+              1177.0
+            ],
+            [
+              660.0,
+              1197.0
+            ],
+            [
+              217.0,
+              1197.0
+            ]
+          ],
+          "score": 0.9436525106430054
+        },
+        {
+          "page_number": 1,
+          "text": "flexible transfer learning. An MED can operate either as",
+          "box": [
+            [
+              746.0,
+              1194.0
+            ],
+            [
+              1282.0,
+              1195.0
+            ],
+            [
+              1282.0,
+              1216.0
+            ],
+            [
+              746.0,
+              1215.0
+            ]
+          ],
+          "score": 0.9737720489501953
+        },
+        {
+          "page_number": 1,
+          "text": "score). BLIP also demonstrates strong general-",
+          "box": [
+            [
+              217.0,
+              1207.0
+            ],
+            [
+              663.0,
+              1207.0
+            ],
+            [
+              663.0,
+              1227.0
+            ],
+            [
+              217.0,
+              1227.0
+            ]
+          ],
+          "score": 0.9905200004577637
+        },
+        {
+          "page_number": 1,
+          "text": "ization ability when directly transferred to video",
+          "box": [
+            [
+              215.0,
+              1233.0
+            ],
+            [
+              663.0,
+              1232.0
+            ],
+            [
+              663.0,
+              1253.0
+            ],
+            [
+              215.0,
+              1254.0
+            ]
+          ],
+          "score": 0.9657223224639893
+        },
+        {
+          "page_number": 1,
+          "text": "a unimodal encoder, or an image-grounded text encoder,",
+          "box": [
+            [
+              747.0,
+              1224.0
+            ],
+            [
+              1284.0,
+              1224.0
+            ],
+            [
+              1284.0,
+              1244.0
+            ],
+            [
+              747.0,
+              1244.0
+            ]
+          ],
+          "score": 0.9698607921600342
+        },
+        {
+          "page_number": 1,
+          "text": "or an image-grounded text decoder. The model is jointly",
+          "box": [
+            [
+              747.0,
+              1251.0
+            ],
+            [
+              1282.0,
+              1251.0
+            ],
+            [
+              1282.0,
+              1271.0
+            ],
+            [
+              747.0,
+              1271.0
+            ]
+          ],
+          "score": 0.971546471118927
+        },
+        {
+          "page_number": 1,
+          "text": "language tasks in a zero-shot manner. Code, mod-",
+          "box": [
+            [
+              216.0,
+              1261.0
+            ],
+            [
+              663.0,
+              1261.0
+            ],
+            [
+              663.0,
+              1281.0
+            ],
+            [
+              216.0,
+              1281.0
+            ]
+          ],
+          "score": 0.9558098912239075
+        },
+        {
+          "page_number": 1,
+          "text": "pre-trained with three vision-language objectives: image-",
+          "box": [
+            [
+              746.0,
+              1277.0
+            ],
+            [
+              1285.0,
+              1277.0
+            ],
+            [
+              1285.0,
+              1300.0
+            ],
+            [
+              746.0,
+              1300.0
+            ]
+          ],
+          "score": 0.9705195426940918
+        },
+        {
+          "page_number": 1,
+          "text": "els, and datasets are released.",
+          "box": [
+            [
+              217.0,
+              1290.0
+            ],
+            [
+              482.0,
+              1290.0
+            ],
+            [
+              482.0,
+              1307.0
+            ],
+            [
+              217.0,
+              1307.0
+            ]
+          ],
+          "score": 0.9768244624137878
+        },
+        {
+          "page_number": 1,
+          "text": "text contrastive learning, image-text matching, and image-",
+          "box": [
+            [
+              746.0,
+              1304.0
+            ],
+            [
+              1284.0,
+              1305.0
+            ],
+            [
+              1284.0,
+              1326.0
+            ],
+            [
+              746.0,
+              1325.0
+            ]
+          ],
+          "score": 0.9665160179138184
+        },
+        {
+          "page_number": 1,
+          "text": "conditioned language modeling.",
+          "box": [
+            [
+              745.0,
+              1331.0
+            ],
+            [
+              1038.0,
+              1331.0
+            ],
+            [
+              1038.0,
+              1353.0
+            ],
+            [
+              745.0,
+              1353.0
+            ]
+          ],
+          "score": 0.9813103079795837
+        },
+        {
+          "page_number": 1,
+          "text": "1. Introduction",
+          "box": [
+            [
+              171.0,
+              1359.0
+            ],
+            [
+              347.0,
+              1359.0
+            ],
+            [
+              347.0,
+              1383.0
+            ],
+            [
+              171.0,
+              1383.0
+            ]
+          ],
+          "score": 0.9831181168556213
+        },
+        {
+          "page_number": 1,
+          "text": "(b) Captioning and Filtering (CapFilt): a new dataset bos-",
+          "box": [
+            [
+              746.0,
+              1372.0
+            ],
+            [
+              1286.0,
+              1372.0
+            ],
+            [
+              1286.0,
+              1395.0
+            ],
+            [
+              746.0,
+              1395.0
+            ]
+          ],
+          "score": 0.9683754444122314
+        },
+        {
+          "page_number": 1,
+          "text": "Vision-language pre-training has recently received tremen-",
+          "box": [
+            [
+              170.0,
+              1407.0
+            ],
+            [
+              711.0,
+              1407.0
+            ],
+            [
+              711.0,
+              1430.0
+            ],
+            [
+              170.0,
+              1430.0
+            ]
+          ],
+          "score": 0.9780980348587036
+        },
+        {
+          "page_number": 1,
+          "text": "trapping method for learning from noisy image-text pairs.",
+          "box": [
+            [
+              746.0,
+              1399.0
+            ],
+            [
+              1287.0,
+              1399.0
+            ],
+            [
+              1287.0,
+              1422.0
+            ],
+            [
+              746.0,
+              1422.0
+            ]
+          ],
+          "score": 0.9908125400543213
+        },
+        {
+          "page_number": 1,
+          "text": "We finetune a pre-trained MED into two modules: a cap-",
+          "box": [
+            [
+              744.0,
+              1424.0
+            ],
+            [
+              1286.0,
+              1427.0
+            ],
+            [
+              1286.0,
+              1450.0
+            ],
+            [
+              744.0,
+              1447.0
+            ]
+          ],
+          "score": 0.9766654372215271
+        },
+        {
+          "page_number": 1,
+          "text": "dous success on various multimodal downstream tasks.",
+          "box": [
+            [
+              171.0,
+              1435.0
+            ],
+            [
+              710.0,
+              1435.0
+            ],
+            [
+              710.0,
+              1455.0
+            ],
+            [
+              171.0,
+              1455.0
+            ]
+          ],
+          "score": 0.9750621318817139
+        },
+        {
+          "page_number": 1,
+          "text": "However, existing methods have two major limitations:",
+          "box": [
+            [
+              169.0,
+              1462.0
+            ],
+            [
+              675.0,
+              1461.0
+            ],
+            [
+              675.0,
+              1484.0
+            ],
+            [
+              169.0,
+              1485.0
+            ]
+          ],
+          "score": 0.9851773381233215
+        },
+        {
+          "page_number": 1,
+          "text": "tioner to produce synthetic captions given web images, and",
+          "box": [
+            [
+              747.0,
+              1456.0
+            ],
+            [
+              1283.0,
+              1456.0
+            ],
+            [
+              1283.0,
+              1476.0
+            ],
+            [
+              747.0,
+              1476.0
+            ]
+          ],
+          "score": 0.9825394153594971
+        },
+        {
+          "page_number": 1,
+          "text": "a filter to remove noisy captions from both the original web",
+          "box": [
+            [
+              748.0,
+              1483.0
+            ],
+            [
+              1282.0,
+              1483.0
+            ],
+            [
+              1282.0,
+              1503.0
+            ],
+            [
+              748.0,
+              1503.0
+            ]
+          ],
+          "score": 0.963034987449646
+        },
+        {
+          "page_number": 1,
+          "text": "(1) Model perspective: most methods either adopt an",
+          "box": [
+            [
+              171.0,
+              1505.0
+            ],
+            [
+              707.0,
+              1505.0
+            ],
+            [
+              707.0,
+              1525.0
+            ],
+            [
+              171.0,
+              1525.0
+            ]
+          ],
+          "score": 0.9819211959838867
+        },
+        {
+          "page_number": 1,
+          "text": "texts and the synthetic texts.",
+          "box": [
+            [
+              747.0,
+              1510.0
+            ],
+            [
+              1003.0,
+              1510.0
+            ],
+            [
+              1003.0,
+              1530.0
+            ],
+            [
+              747.0,
+              1530.0
+            ]
+          ],
+          "score": 0.972057044506073
+        },
+        {
+          "page_number": 1,
+          "text": "encoder-based model (Radford et al., 2021; Li et al., 2021a),",
+          "box": [
+            [
+              171.0,
+              1532.0
+            ],
+            [
+              709.0,
+              1532.0
+            ],
+            [
+              709.0,
+              1552.0
+            ],
+            [
+              171.0,
+              1552.0
+            ]
+          ],
+          "score": 0.9603292942047119
+        },
+        {
+          "page_number": 1,
+          "text": "or an encoder-decoder (Cho et al., 2021; Wang et al, 2021)",
+          "box": [
+            [
+              170.0,
+              1557.0
+            ],
+            [
+              709.0,
+              1557.0
+            ],
+            [
+              709.0,
+              1580.0
+            ],
+            [
+              170.0,
+              1580.0
+            ]
+          ],
+          "score": 0.9501990675926208
+        },
+        {
+          "page_number": 1,
+          "text": "We perform extensive experiments and analysis, and make",
+          "box": [
+            [
+              746.0,
+              1551.0
+            ],
+            [
+              1282.0,
+              1551.0
+            ],
+            [
+              1282.0,
+              1571.0
+            ],
+            [
+              746.0,
+              1571.0
+            ]
+          ],
+          "score": 0.9845009446144104
+        },
+        {
+          "page_number": 1,
+          "text": "model. However, encoder-based models are less straightfor-",
+          "box": [
+            [
+              169.0,
+              1584.0
+            ],
+            [
+              710.0,
+              1583.0
+            ],
+            [
+              710.0,
+              1606.0
+            ],
+            [
+              169.0,
+              1607.0
+            ]
+          ],
+          "score": 0.9734899997711182
+        },
+        {
+          "page_number": 1,
+          "text": "the following key observations.",
+          "box": [
+            [
+              747.0,
+              1578.0
+            ],
+            [
+              1032.0,
+              1578.0
+            ],
+            [
+              1032.0,
+              1598.0
+            ],
+            [
+              747.0,
+              1598.0
+            ]
+          ],
+          "score": 0.9937258958816528
+        },
+        {
+          "page_number": 1,
+          "text": "ward to directly transfer to text generation tasks (e.g. image",
+          "box": [
+            [
+              170.0,
+              1613.0
+            ],
+            [
+              707.0,
+              1614.0
+            ],
+            [
+              707.0,
+              1635.0
+            ],
+            [
+              170.0,
+              1634.0
+            ]
+          ],
+          "score": 0.9781399369239807
+        },
+        {
+          "page_number": 1,
+          "text": "•We show that the captioner and the filter work together to",
+          "box": [
+            [
+              746.0,
+              1616.0
+            ],
+            [
+              1282.0,
+              1617.0
+            ],
+            [
+              1282.0,
+              1638.0
+            ],
+            [
+              746.0,
+              1637.0
+            ]
+          ],
+          "score": 0.9697968363761902
+        },
+        {
+          "page_number": 1,
+          "text": "captioning), whereas encoder-decoder models have not been",
+          "box": [
+            [
+              171.0,
+              1640.0
+            ],
+            [
+              706.0,
+              1639.0
+            ],
+            [
+              706.0,
+              1661.0
+            ],
+            [
+              171.0,
+              1662.0
+            ]
+          ],
+          "score": 0.9571996331214905
+        },
+        {
+          "page_number": 1,
+          "text": "achieve substantial performance improvement on various",
+          "box": [
+            [
+              765.0,
+              1645.0
+            ],
+            [
+              1282.0,
+              1646.0
+            ],
+            [
+              1282.0,
+              1666.0
+            ],
+            [
+              765.0,
+              1665.0
+            ]
+          ],
+          "score": 0.98824542760849
+        },
+        {
+          "page_number": 1,
+          "text": "successfully adopted for image-text retrieval tasks.",
+          "box": [
+            [
+              170.0,
+              1667.0
+            ],
+            [
+              631.0,
+              1666.0
+            ],
+            [
+              631.0,
+              1687.0
+            ],
+            [
+              170.0,
+              1688.0
+            ]
+          ],
+          "score": 0.950001060962677
+        },
+        {
+          "page_number": 1,
+          "text": "downstream tasks by bootstrapping the captions. We also",
+          "box": [
+            [
+              765.0,
+              1669.0
+            ],
+            [
+              1282.0,
+              1670.0
+            ],
+            [
+              1282.0,
+              1693.0
+            ],
+            [
+              765.0,
+              1692.0
+            ]
+          ],
+          "score": 0.9878348708152771
+        },
+        {
+          "page_number": 1,
+          "text": "find that more diverse captions yield larger gains.",
+          "box": [
+            [
+              765.0,
+              1698.0
+            ],
+            [
+              1214.0,
+              1700.0
+            ],
+            [
+              1214.0,
+              1720.0
+            ],
+            [
+              765.0,
+              1718.0
+            ]
+          ],
+          "score": 0.974168062210083
+        },
+        {
+          "page_number": 1,
+          "text": "(2) Data perspective: most state-of-the-art methods (e.g.,",
+          "box": [
+            [
+              172.0,
+              1709.0
+            ],
+            [
+              709.0,
+              1709.0
+            ],
+            [
+              709.0,
+              1729.0
+            ],
+            [
+              172.0,
+              1729.0
+            ]
+          ],
+          "score": 0.9672787189483643
+        },
+        {
+          "page_number": 1,
+          "text": "CLIP (Radford et al., 2021), ALBEF (Li et all., 2021a),",
+          "box": [
+            [
+              172.0,
+              1736.0
+            ],
+            [
+              709.0,
+              1736.0
+            ],
+            [
+              709.0,
+              1756.0
+            ],
+            [
+              172.0,
+              1756.0
+            ]
+          ],
+          "score": 0.9140897989273071
+        },
+        {
+          "page_number": 1,
+          "text": "•BLIP achieves state-of-the-art performance on a wide",
+          "box": [
+            [
+              748.0,
+              1734.0
+            ],
+            [
+              1282.0,
+              1735.0
+            ],
+            [
+              1282.0,
+              1756.0
+            ],
+            [
+              748.0,
+              1755.0
+            ]
+          ],
+          "score": 0.9796319007873535
+        },
+        {
+          "page_number": 1,
+          "text": "SimVLM (Wang et al., 2021)) pre-train on image-text pairs",
+          "box": [
+            [
+              172.0,
+              1762.0
+            ],
+            [
+              708.0,
+              1762.0
+            ],
+            [
+              708.0,
+              1785.0
+            ],
+            [
+              172.0,
+              1785.0
+            ]
+          ],
+          "score": 0.9537397027015686
+        },
+        {
+          "page_number": 1,
+          "text": "range of vision-language tasks, including image-text re-",
+          "box": [
+            [
+              764.0,
+              1762.0
+            ],
+            [
+              1286.0,
+              1762.0
+            ],
+            [
+              1286.0,
+              1785.0
+            ],
+            [
+              764.0,
+              1785.0
+            ]
+          ],
+          "score": 0.9633257985115051
+        }
+      ]
+    }
+  ]
+}

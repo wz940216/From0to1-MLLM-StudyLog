@@ -2,6 +2,26 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "week23 debug module",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "console": "integratedTerminal",
+            "args": [
+                "week23_project_optimize.service.app:app",
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "9200",
+                "--workers",
+                "1"
+            ],
+            "env": {
+                "DOC_QA_PRELOAD_VLM": "false",
+                "DOC_QA_PRELOAD_OCR": "false"
+            }
+        },   
+        {
             "name": "week22 debug module",
             "type": "debugpy",
             "request": "launch",

@@ -26,6 +26,10 @@ week18_minillava_hf_vllm/outputs/transformers
 week18_minillava_hf_vllm/outputs/vllm
 week21_project_design/output
 week22_project_core_impl/outputs
+week23_project_optimize/cache
+week23_project_optimize/outputs
+week23_project_optimize/uploads
+week23_project_optimize/logs
 
 dataset/alpaca-chinese-dataset
 dataset/cifar-10-batches-py
@@ -46,7 +50,5 @@ dataset/XFUND
 __pycache__/
 .env
 *.log
-.vscodeweek23_project_optimize/cache
-week23_project_optimize/outputs
-week23_project_optimize/uploads
-week23_project_optimize/logs
+.vscode
+

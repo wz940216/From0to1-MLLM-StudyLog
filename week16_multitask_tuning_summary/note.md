@@ -5,7 +5,7 @@
 实验共分为三个阶段：  
 第一阶段利用 coco caption val / VQA cal/ LLaVA-CC3M-Pretrain-595K 数据做 SFT，冻结 vision encoder 和 qwen1.5 的部分，重点训练 projector，让视觉和语言模型对齐。 
 
-第二阶段利用多模态指令数据 LLaVA-Instruct-150K 做 SFT，开放 projector 和 qwen1.5 的部分，同时降低了 projector 的学习率，对于 llm 采用训练 LoRA 的形式，让模型更好地适应多模态指令任务。   
+第二阶段利用多模态指令数据 LLaVA-Instruct-150K（图片在 http://images.cocodataset.org/zips/train2017.zip 自行下载） 做 SFT，开放 projector 和 qwen1.5 的部分，同时降低了 projector 的学习率，对于 llm 采用训练 LoRA 的形式，让模型更好地适应多模态指令任务。   
 
 第三阶段利用 DPO 进行微调，提高模型在多模态指令任务上的表现。  
 
